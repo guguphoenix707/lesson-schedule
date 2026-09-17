@@ -64,6 +64,8 @@ pnpm --filter @class/backend build
 当前课次参与接口：
 
 - `GET /api/session-participants`：当前教师待处理试听名单（已安排、课次未取消且已结束、有效预约出勤仍为 pending）。管理员 403。
+- `GET /api/session-participants/:participantId`：当前教师待处理的单条试听。不在待处理名单中 404。
+- `POST /api/session-participants/:participantId/attendance`：教师登记已到课（含反馈）或未到课。事务内锁定 TrialCase；已到课 → pending_followup，未到课 → pending_schedule。重复提交 409。
 
 不开放注册。演示账号与密码以 `db/README.md` 为准。
 

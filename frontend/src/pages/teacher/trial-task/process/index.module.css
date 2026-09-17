@@ -1,0 +1,31 @@
+.content {
+  width: min(720px, calc(100% - 48px));
+  min-height: 320px;
+  margin: 32px auto;
+  padding: 32px;
+  border-radius: var(--app-radius-card);
+  background: var(--app-color-surface);
+  box-shadow: var(--app-shadow-card);
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0 !important;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.actions {
+  margin-top: 8px;
+}

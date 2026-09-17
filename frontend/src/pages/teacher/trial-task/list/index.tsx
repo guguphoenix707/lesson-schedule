@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Table, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import { filter } from 'lodash-es';
+import { useNavigate } from 'react-router-dom';
 import {
   fetchTeacherTrialTasks,
   teacherTrialTasksQueryKey,
@@ -38,13 +39,20 @@ const melbourneTime = new Intl.DateTimeFormat('zh-CN', {
 });
 
 export function TeacherTrialTaskListPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState<TrialQueryBannerValue>(emptyTrialQuery);
   const [page, setPage] = useState(1);
   const tasksQuery = useQuery({
     queryKey: teacherTrialTasksQueryKey,
     queryFn: fetchTeacherTrialTasks,
   });
-  const columns = useMemo(() => createColumns(), []);
+  const columns = useMemo(
+    () =>
+      createColumns((participantId) => {
+        navigate(`/teacher/trial-task/${participantId}`);
+      }),
+    [navigate],
+  );
   const filteredTasks = useMemo(() => {
     const tasks = tasksQuery.data ?? [];
     return filter(tasks, (task) =>
@@ -103,7 +111,9 @@ export function TeacherTrialTaskListPage() {
   );
 }
 
-function createColumns(): TableProps<TeacherTrialTask>['columns'] {
+function createColumns(
+  onProcess: (participantId: string) => void,
+): TableProps<TeacherTrialTask>['columns'] {
   return [
     {
       title: '课程时间',
@@ -127,8 +137,15 @@ function createColumns(): TableProps<TeacherTrialTask>['columns'] {
     {
       title: '操作',
       key: 'actions',
-      render: () => (
-        <Button type="link">处理</Button>
+      render: (_value, record) => (
+        <Button
+          type="link"
+          onClick={() => {
+            onProcess(record.id);
+          }}
+        >
+          处理
+        </Button>
       ),
     },
   ];

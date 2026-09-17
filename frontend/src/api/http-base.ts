@@ -25,6 +25,10 @@ export function isHttpNotFound(error: unknown): boolean {
   return axios.isAxiosError(error) && error.response?.status === 404;
 }
 
+export function isHttpConflict(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 409;
+}
+
 export function getHttpErrorMessage(error: unknown, fallback: string): string {
   if (!axios.isAxiosError(error)) {
     if (error instanceof Error && error.message.length > 0) {

@@ -24,4 +24,4 @@ export type AppSubjects = Subjects<{
   SessionParticipant: SessionParticipant;
 }>;
 
-export type AppAbility = Ability<['read', AppSubjects], PrismaQuery>;
+export type AppAbility = Ability<['read' | 'update', AppSubjects], PrismaQuery>;

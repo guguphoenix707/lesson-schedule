@@ -20,6 +20,9 @@ export function createAbilityFor(user: AuthenticatedUser): AppAbility {
     can('read', 'SessionParticipant', {
       session: { assignedTeacherId: user.id },
     });
+    can('update', 'SessionParticipant', {
+      session: { assignedTeacherId: user.id },
+    });
   }
 
   return build();

@@ -30,6 +30,8 @@
 | `/trial-tasklist` | `src/api/trial-tasklist.ts` | 当前管理员名下学生关联的试听流程列表。教师 403。 |
 | `/students/:studentId` | `src/api/students.ts` | 学生卡片与试听课程。管理员只能读自己负责的学生。 |
 | `/session-participants` | `src/api/session-participants.ts` | 当前教师待处理试听名单。管理员 403。 |
+| `/session-participants/:participantId` | `src/api/session-participants.ts` | 当前教师待处理的单条试听。不在名单中 404。 |
+| `/session-participants/:participantId/attendance` | `src/api/session-participants.ts` | 教师登记已到课或未到课。重复提交 409。 |
 
 ## Ant Design
 

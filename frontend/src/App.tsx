@@ -5,6 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/home/home-page';
 import { LoginRoute } from './pages/login/login-route';
 import { TeacherTrialTaskListPage } from './pages/teacher/trial-task/list';
+import { TeacherTrialProcessPage } from './pages/teacher/trial-task/process';
 import { TrialTasklistPage } from './pages/trial-tasklist/trial-tasklist-page';
 import { AdminGuard } from './routes/admin-guard';
 import { AuthGuard } from './routes/auth-guard';
@@ -46,6 +47,10 @@ export function App() {
                   <Route
                     path="/teacher/trial-task/list"
                     element={<TeacherTrialTaskListPage />}
+                  />
+                  <Route
+                    path="/teacher/trial-task/:participantId"
+                    element={<TeacherTrialProcessPage />}
                   />
                 </Route>
               </Route>
