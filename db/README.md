@@ -23,7 +23,13 @@
 
 ## 执行
 
-需要 PostgreSQL 14+。本地推荐用 `./scripts/dev.sh`：它会拉起 `docker-compose.yml` 里的 Postgres（映射到宿主机 `55432`），空库才写入种子。连接串示例见 `backend/.env.example`。用户名 `postgres` / 密码 `postgres` 只用于这个本地开发容器。
+需要 PostgreSQL 14+。本地推荐用 `./scripts/dev.sh`：它会拉起 `docker-compose.yml` 里的 Postgres（映射到宿主机 `55432`），空库才写入种子。要把已有演示库清回同一套种子，用：
+
+```bash
+./scripts/db-reset.sh --yes
+```
+
+连接串示例见 `backend/.env.example`。用户名 `postgres` / 密码 `postgres` 只用于这个本地开发容器。
 
 不经过 Docker、后端依赖也未安装时，用本机 `psql`：
 
@@ -35,7 +41,7 @@ psql -d class -v ON_ERROR_STOP=1 -f db/migrations/20260917100000_trial_intake_fr
 psql -d class -v ON_ERROR_STOP=1 -f db/seed/001-trial-journey.sql
 ```
 
-后端依赖安装后：
+后端依赖安装后，日常重置用 `./scripts/db-reset.sh --yes`。它就是下面这组命令：
 
 ```bash
 cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串和 BETTER_AUTH_SECRET

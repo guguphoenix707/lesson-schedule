@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Drawer, Flex, Space, Table, Tag, Typography } from 'antd';
 import type { TableProps } from 'antd';
@@ -27,6 +28,7 @@ import {
   matchesTrialQuery,
 } from '../../trial/query';
 import type { TrialQueryBannerValue } from '../../trial/query';
+import { TodoList } from './components/todo-list';
 import styles from './trial-tasklist-page.module.css';
 
 const trialTablePageSize = 10;
@@ -59,13 +61,29 @@ export function TrialTasklistPage() {
     <AppShell>
       <main className={styles.content}>
         <div className={styles.heading}>
-          <Typography.Title className={styles.title} level={3}>
-            待办中心
-          </Typography.Title>
+          <div className={styles.headingTop}>
+            <Typography.Title className={styles.title} level={3}>
+              待办中心
+            </Typography.Title>
+            <Button
+              htmlType="button"
+              icon={<ReloadOutlined />}
+              loading={tasklistQuery.isFetching}
+              onClick={() => {
+                tasklistQuery.refetch();
+              }}
+            >
+              刷新
+            </Button>
+          </div>
           <Typography.Paragraph type="secondary">
             只显示与你关联的试听。学生姓名可打开卡片；操作按当前试听状态列出。
           </Typography.Paragraph>
         </div>
+        <TodoList
+          items={tasklistQuery.data}
+          loading={tasklistQuery.isPending}
+        />
         <TrialQueryBanner
           statusOptions={trialCaseStatusOptions}
           value={query}

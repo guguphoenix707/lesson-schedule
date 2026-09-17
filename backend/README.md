@@ -82,6 +82,6 @@ pnpm --filter @class/backend prisma:deploy
 pnpm --filter @class/backend seed:auth
 ```
 
-`prisma:deploy` 应用 `db/migrations/`。业务种子是 `db/seed/001-trial-journey.sql`；登录哈希还要再跑 `seed:auth`。
+`prisma:deploy` 应用 `db/migrations/`。业务种子是 `db/seed/001-trial-journey.sql`；登录哈希还要再跑 `seed:auth`。本地把库清回同一套演示数据用 `./scripts/db-reset.sh --yes`。
 
 修改实现前先阅读 `design/rule.md`。文件名必须 kebab-case，见 `docs/code-conventions.md`。

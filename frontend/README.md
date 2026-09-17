@@ -26,7 +26,7 @@
 ## 约定结构
 
 - `src/`：实现代码。
-- `src/trial/`：试听列表共用的状态文案和查询匹配；查询条 UI 为 `src/components/trial-query-banner.tsx`，状态选项由页面注入。
+- `src/trial/`：试听列表共用的状态文案和查询匹配；查询条 UI 为 `src/components/trial-query-banner.tsx`，状态选项由页面注入。管理员待办中心顶部 `TodoList` 汇总待安排、待跟进、已预约、待办理报名数量；待跟进含 `pending_followup`，以及 `following_up` 且 `nextFollowupAt` 已到。
 - `src/api/http-base.ts`：axios 实例，浏览器请求的唯一入口；业务模块只通过它访问 `/api`。HTTP 状态码只在响应拦截器处理，约定见 `design/rule.md`「HTTP 错误处理」。
 - `src/api/auth.ts`：Better Auth 登录、退出和当前会话。不是业务资源。
 - `src/auth/ability.ts`：根据会话角色生成 CASL，只用于界面展示或禁用。

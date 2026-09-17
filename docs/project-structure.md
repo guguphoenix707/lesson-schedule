@@ -55,6 +55,7 @@ class/
 ├── scripts/
 │   ├── README.md
 │   ├── check-filenames.mjs
+│   ├── db-reset.sh
 │   └── dev.sh
 ├── index.js             # 初始化前已有文件，未读取或修改
 ├── package.json         # pnpm workspace 根，packageManager 为 pnpm

@@ -99,8 +99,7 @@ if uses_compose_postgres; then
   )"
   if [[ "${user_count}" == "0" ]]; then
     echo "==> 库是空的，执行一次种子（以后不用再跑）"
-    db_exec psql -U postgres -d class -v ON_ERROR_STOP=1 -f /db/seed/001-trial-journey.sql
-    pnpm --filter @class/backend seed:auth
+    "$ROOT/scripts/db-reset.sh" --yes
   fi
 fi
 
