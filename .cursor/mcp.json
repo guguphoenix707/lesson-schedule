@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "antd": {
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "@ant-design/cli",
+        "mcp",
+        "--version",
+        "6.6.4"
+      ]
+    }
+  }
+}
+

@@ -39,3 +39,16 @@
 - 同一职责只保留一个权威位置，避免在多个一级目录重复维护。
 - 模块内部的详细设计放在模块自己的 `design/` 下；跨模块约定放在 `docs/`。
 - 调整一级目录职责时，同一变更中更新本文件和 `docs/project-structure.md`。
+
+## Ant Design CLI MCP
+
+本仓库前端使用 Ant Design 6.6.4。编写或修改 Ant Design 组件前，先通过 `antd` MCP 查询对应版本的官方 API，不凭记忆猜测。完整工作流见 `.agents/skills/antd/SKILL.md`。
+
+- `antd_info`：组件 props、默认值和废弃信息。
+- `antd_doc`：完整组件文档。
+- `antd_demo`：可运行的官方示例。
+- `antd_token` / `antd_design_md`：组件 Token 与整体设计语言。
+- `antd_semantic`：组件语义化 `classNames` / `styles`。
+- `antd_changelog`：版本与组件变更。
+
+查询时使用项目版本 `6.6.4`。修改 Ant Design 代码后，对变更范围运行 Ant Design lint。MCP 配置使用 pnpm；禁止改成 `npx -y` 或通过 npm/yarn 安装 CLI。

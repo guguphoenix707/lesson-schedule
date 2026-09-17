@@ -9,7 +9,7 @@
 - React 19 + TypeScript + Vite
 - React Router DOM 7
 - TanStack Query 5
-- Ant Design 6
+- Ant Design 6.6.4
 - CASL（`@casl/ability`、`@casl/react`）
 - lodash-es（与现有 ESLint 规则一致，禁止原生 `list.map` 等）
 
@@ -39,3 +39,5 @@ pnpm --filter @class/frontend build
 ```
 
 修改实现前先阅读 `design/rule.md`。
+
+涉及 Ant Design 时，还需阅读仓库 `.agents/skills/antd/SKILL.md`，并在写组件前使用 `antd` MCP 核对 6.6.4 对应的 API 和示例。
