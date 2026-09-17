@@ -1,0 +1,10 @@
+---
+description: 修改 backend 时遵守后端目录说明与编码约定
+globs: backend/**/*
+alwaysApply: false
+---
+
+# Backend
+
+修改 `backend/` 前阅读 `backend/README.md`；修改实现代码前同时阅读并遵守 `backend/design/rule.md`。
+

@@ -1,0 +1,10 @@
+---
+description: 修改 frontend 时遵守前端目录说明与编码约定
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Frontend
+
+修改 `frontend/` 前阅读 `frontend/README.md`；修改实现代码前同时阅读并遵守 `frontend/design/rule.md`。
+
