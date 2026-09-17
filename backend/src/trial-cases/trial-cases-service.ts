@@ -116,7 +116,8 @@ export class TrialCasesService {
           throw new NotFoundException();
         }
 
-        if (trialCase.status !== 'pending_schedule') {
+        const isReschedule = trialCase.status === 'scheduled';
+        if (trialCase.status !== 'pending_schedule' && !isReschedule) {
           throw new ConflictException('当前状态不能安排试听');
         }
 
@@ -139,9 +140,13 @@ export class TrialCasesService {
             bookingStatus: 'booked',
             attendance: 'pending',
           },
-          select: { id: true },
+          select: { id: true, sessionId: true },
         });
-        if (openBooking) {
+        if (isReschedule) {
+          if (!openBooking) {
+            throw new ConflictException('没有可改期的试听安排');
+          }
+        } else if (openBooking) {
           throw new ConflictException('已有待上课的试听安排');
         }
 
@@ -162,6 +167,10 @@ export class TrialCasesService {
           throw new BadRequestException('不能安排已开始的课次');
         }
 
+        if (isReschedule && openBooking?.sessionId === session.id) {
+          throw new ConflictException('请选择其他课次');
+        }
+
         const existingOnSession = await tx.sessionParticipant.findUnique({
           where: {
             sessionId_studentId: {
@@ -173,6 +182,24 @@ export class TrialCasesService {
         });
         if (existingOnSession) {
           throw new ConflictException('该课次已有该学生的预约记录');
+        }
+
+        if (isReschedule && openBooking) {
+          const cancelled = await tx.sessionParticipant.updateMany({
+            where: {
+              id: openBooking.id,
+              bookingStatus: 'booked',
+              attendance: 'pending',
+            },
+            data: {
+              bookingStatus: 'cancelled',
+              cancelledAt: new Date(),
+              cancelReason: '改期',
+            },
+          });
+          if (cancelled.count !== 1) {
+            throw new ConflictException('没有可改期的试听安排');
+          }
         }
 
         const overlapping = await tx.sessionParticipant.findFirst({
@@ -203,15 +230,17 @@ export class TrialCasesService {
           },
         });
 
-        const updated = await tx.trialCase.updateMany({
-          where: {
-            id: trialCase.id,
-            status: 'pending_schedule',
-          },
-          data: { status: 'scheduled' },
-        });
-        if (updated.count !== 1) {
-          throw new ConflictException('当前状态不能安排试听');
+        if (!isReschedule) {
+          const updated = await tx.trialCase.updateMany({
+            where: {
+              id: trialCase.id,
+              status: 'pending_schedule',
+            },
+            data: { status: 'scheduled' },
+          });
+          if (updated.count !== 1) {
+            throw new ConflictException('当前状态不能安排试听');
+          }
         }
       });
     } catch (error) {

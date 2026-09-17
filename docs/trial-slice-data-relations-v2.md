@@ -58,6 +58,7 @@ TrialCase.status 明确管理整个试听流程，不再只区分是否结束。
 |-|-|-|
 | 报名试听 | 尚无试听流程 | 创建唯一 TrialCase，status=pending_schedule；尚无 Participant。 |
 | 安排试听 | pending_schedule | 写入有效 Participant(kind=trial)，status=scheduled；服务端校验时间、试听资格和冲突。 |
+| 改期 | scheduled，当前预约仍有效且未到课 | 同事务取消当前有效预约并创建新 Participant；status 保持 scheduled。旧记录保留，重新校验时间冲突。 |
 | 老师提交已到课及反馈 | scheduled | Participant.attendance=present 并保存反馈；TrialCase.status=pending_followup。 |
 | 老师提交缺席 | scheduled | Participant.attendance=absent；按当前可重约假设，TrialCase.status=pending_schedule；原记录保留。 |
 | 当前预约取消或课次取消 | scheduled | 取消仍有效且未到课的 Participant；受影响 TrialCase 回 pending_schedule，不改成缺席。已结束流程不能被旧课次取消事件重置。 |
@@ -67,7 +68,7 @@ TrialCase.status 明确管理整个试听流程，不再只区分是否结束。
 
 Admin 待安排数 = status=pending_schedule；待跟进数 = status=pending_followup，或 status=following_up 且 next_followup_at 已到；已预约数 = status=scheduled；待办理报名数 = status=interested。老师待处理还须检查 assigned_teacher_id=当前老师、课次未取消且已结束、有效预约 attendance=pending。
 
-所有状态转换由服务端业务动作驱动，不提供任意修改 status 的通用接口。安排、反馈、取消和跟进事务内锁定 TrialCase 并校验原状态；重复提交不得把后续阶段重置。AI 生成或保存草稿不推进流程。
+所有状态转换由服务端业务动作驱动，不提供任意修改 status 的通用接口。安排、改期、反馈、取消和跟进事务内锁定 TrialCase 并校验原状态；重复提交不得把后续阶段重置。AI 生成或保存草稿不推进流程。
 
 ## 正式入班与试听共用一次课名单
 

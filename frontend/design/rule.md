@@ -29,7 +29,7 @@
 | `/common/*` | 对应公开接口客户端 | 不依赖登录。 |
 | `/trial-tasklist` | `src/api/trial-tasklist.ts` | 当前管理员名下学生关联的试听流程列表。教师 403。 |
 | `/trial-cases/:trialCaseId/schedulable-sessions` | `src/api/trial-cases.ts` | 该试听可安排的未来课次，以及关联学生 id / displayName。教师 403。 |
-| `/trial-cases/:trialCaseId/schedule` | `src/api/trial-cases.ts` | 为待安排试听选择已有课次。教师 403。 |
+| `/trial-cases/:trialCaseId/schedule` | `src/api/trial-cases.ts` | 为待安排或改期试听选择已有课次。教师 403。 |
 | `/trial-cases/:trialCaseId` | `src/api/trial-cases.ts` | 管理员试听跟踪详情：草稿、教师反馈、跟进历史。教师 403。 |
 | `/trial-cases/:trialCaseId/followup-draft` | `src/api/trial-cases.ts` | 保存沟通草稿，不推进 TrialCase.status。仅 pending_followup / following_up。教师 403。 |
 | `/trial-cases/:trialCaseId/follow-ups` | `src/api/trial-cases.ts` | 提交跟进结果并追加 FollowUp。教师 403。 |

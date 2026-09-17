@@ -23,7 +23,8 @@ export class TrialCasesController {
 
   @Post(':trialCaseId/schedule')
   @ApiOperation({
-    summary: 'Book an existing class session onto a pending trial case',
+    summary:
+      'Book or reschedule an existing class session onto a trial case',
   })
   schedule(
     @CurrentUser() user: AuthenticatedUser,

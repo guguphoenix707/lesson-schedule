@@ -191,7 +191,7 @@ function createColumns(
                 target={action === 'follow_up' ? '_blank' : undefined}
                 type="link"
                 onClick={() => {
-                  if (action === 'schedule') {
+                  if (action === 'schedule' || action === 'reschedule') {
                     history.push(`/scheduleTrial/${record.id}`);
                   }
                 }}

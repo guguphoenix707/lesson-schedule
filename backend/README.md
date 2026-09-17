@@ -60,7 +60,7 @@ pnpm --filter @class/backend build
 
 - `GET /api/trial-tasklist`：当前管理员名下学生关联的试听流程列表。查询 `TrialCase`，并按 `student.owner_admin_id` 限定为当前管理员；教师 403。
 - `GET /api/trial-cases/:trialCaseId/schedulable-sessions`：该试听可安排的未来课次（未取消、未开始，且该学生尚未有该课次记录），以及关联学生的 `id` / `displayName`。教师 403。
-- `POST /api/trial-cases/:trialCaseId/schedule`：为 `pending_schedule` 的试听安排已有课次。事务内锁定 TrialCase，写入 trial `SessionParticipant` 并将状态改为 `scheduled`。教师 403。
+- `POST /api/trial-cases/:trialCaseId/schedule`：为试听选择已有课次。`pending_schedule` 时写入新预约并改为 `scheduled`；`scheduled` 且仍有有效未到课预约时先取消旧预约再写入新预约，状态保持 `scheduled`。教师 403。
 - `GET /api/trial-cases/:trialCaseId`：当前管理员名下该试听的跟踪详情（沟通草稿、教师反馈、跟进历史）。教师 403。
 - `POST /api/trial-cases/:trialCaseId/followup-draft`：保存沟通草稿，不推进 `TrialCase.status`。仅 `pending_followup` / `following_up`。教师 403。
 - `POST /api/trial-cases/:trialCaseId/follow-ups`：提交跟进结果。事务内锁定 TrialCase，追加 FollowUp：未联系上/考虑中 → `following_up` 并写入未来 `next_followup_at`；有报名意向 → `interested`；暂不考虑 → `closed`。教师 403。重复提交不得把后续阶段重置。
