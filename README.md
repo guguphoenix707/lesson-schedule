@@ -14,7 +14,7 @@
 
 ## 当前技术栈
 
-- 前端：Vite + React + TypeScript、React Router、TanStack Query、Ant Design
+- 前端：Vite + React + TypeScript、React Router、TanStack Query、Ant Design、axios
 - 后端：NestJS（Fastify）+ Better Auth + CASL + Swagger
 - 数据库：PostgreSQL + Prisma 7
 
@@ -27,4 +27,14 @@ pnpm dev:frontend
 pnpm dev:backend
 ```
 
-前端默认 `http://localhost:5173`，后端 `http://localhost:3000`，Swagger `http://localhost:3000/api/docs`。
+前端默认 `http://localhost:5173`，后端 `http://localhost:3000`，Swagger `http://localhost:3000/api/docs`。登录前先按 `db/README.md` 准备数据库和演示账号；演示密码与邮箱也写在该文件。
+
+## 持续集成
+
+推送到 `main` 或打开 Pull Request 时，GitHub Actions 会安装依赖并运行 `pnpm check`：前端 lint/build，以及后端 Prisma client 生成和 build。本地同样执行：
+
+```bash
+pnpm check
+```
+
+`prisma generate` 需要 `DATABASE_URL`。CI 使用占位连接串，不连接真实数据库；本地会读取 `backend/.env`。

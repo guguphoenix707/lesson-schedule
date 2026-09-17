@@ -24,6 +24,7 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。
 ## 约定结构
 
 - `src/`：实现代码。
+- `scripts/`：认证演示账号等模块内可重复脚本。
 - `tests/`：模块测试、集成测试和契约测试。
 - `design/`：本模块的架构、接口和编码约定。
 - `prisma.config.ts`：Prisma CLI 配置（连接串、schema / 迁移路径）。
@@ -34,18 +35,29 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。
 
 ```bash
 pnpm install
-cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串，不要提交
+cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串和 BETTER_AUTH_SECRET，不要提交
 pnpm --filter @class/backend start:dev
 pnpm --filter @class/backend build
 ```
 
 开发环境 Swagger UI：`http://localhost:3000/api/docs`。
 
+当前登录接口：
+
+- `POST /api/auth/sign-in/email`：邮箱密码登录（Better Auth，HttpOnly Cookie）
+- `POST /api/auth/sign-out`：退出
+- `GET /api/me`：当前员工会话；未登录返回 401
+
+不开放注册。演示账号与密码以 `db/README.md` 为准。
+
 Prisma：
 
 ```bash
 pnpm --filter @class/backend prisma:generate
-pnpm --filter @class/backend prisma:migrate
+pnpm --filter @class/backend prisma:deploy
+pnpm --filter @class/backend seed:auth
 ```
+
+`prisma:deploy` 应用 `db/migrations/`。业务种子是 `db/seed/001_trial_journey.sql`；登录哈希还要再跑 `seed:auth`。
 
 修改实现前先阅读 `design/rule.md`。

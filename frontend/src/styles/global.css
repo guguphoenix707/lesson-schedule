@@ -1,0 +1,29 @@
+:root {
+  --app-color-primary: #5c5aa7;
+  --app-color-layout: #c9ccd4;
+  --app-color-surface: #ffffff;
+  --app-color-border: rgba(255, 255, 255, 0.72);
+  --app-color-text: #191a22;
+  --app-radius-card: 24px;
+  --app-shadow-card: 0 24px 64px rgba(51, 53, 71, 0.16);
+  color: var(--app-color-text);
+  background: var(--app-color-layout);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+}

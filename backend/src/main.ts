@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { env } from './env';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -17,11 +18,12 @@ async function bootstrap() {
     .setTitle('Class API')
     .setDescription('Student management API')
     .setVersion('0.0.1')
+    .addCookieAuth('better-auth.session_token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(env.port, '0.0.0.0');
 }
 
 void bootstrap();

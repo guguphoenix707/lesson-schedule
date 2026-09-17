@@ -6,7 +6,15 @@
 class/
 ├── AGENTS.md
 ├── README.md
-├── .cursor/rules/
+├── .agents/
+│   └── skills/antd/SKILL.md
+├── .cursor/
+│   ├── mcp.json
+│   ├── rules/
+│   └── skills/antd -> ../../.agents/skills/antd
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── frontend/
 │   ├── README.md
 │   ├── package.json
@@ -24,6 +32,7 @@ class/
 │   ├── prisma.config.ts
 │   ├── design/rule.md
 │   ├── src/
+│   ├── scripts/
 │   └── tests/
 ├── db/
 │   ├── README.md
@@ -70,6 +79,7 @@ class/
 - `docs/`：跨模块且需要长期维护的文档。
 - `eval/`：独立于生产实现的质量用例、基线和结果。
 - `scripts/`：跨模块的重复性辅助操作。
+- `.github/`：GitHub Actions 与仓库级 GitHub 配置。
 
 ## 文档阅读顺序
 
