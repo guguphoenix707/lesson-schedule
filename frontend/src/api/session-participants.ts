@@ -1,5 +1,5 @@
 import { httpBase } from './http-base';
-import type { TrialCaseStatus } from './students';
+import type { DerivedSessionLabel, TrialCaseStatus } from './students';
 
 export type TeacherTrialTask = {
   id: string;
@@ -7,6 +7,8 @@ export type TeacherTrialTask = {
   studentDisplayName: string;
   trialCaseId: string;
   status: TrialCaseStatus;
+  derivedSessionLabel: DerivedSessionLabel | null;
+  canProcess: boolean;
   session: {
     id: string;
     startsAt: string;

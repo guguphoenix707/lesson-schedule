@@ -30,9 +30,12 @@
 | `/trial-tasklist` | `src/api/trial-tasklist.ts` | 当前管理员名下学生关联的试听流程列表。教师 403。 |
 | `/trial-cases/:trialCaseId/schedulable-sessions` | `src/api/trial-cases.ts` | 该试听可安排的未来课次，以及关联学生 id / displayName。教师 403。 |
 | `/trial-cases/:trialCaseId/schedule` | `src/api/trial-cases.ts` | 为待安排试听选择已有课次。教师 403。 |
+| `/trial-cases/:trialCaseId` | `src/api/trial-cases.ts` | 管理员试听跟踪详情：草稿、教师反馈、跟进历史。教师 403。 |
+| `/trial-cases/:trialCaseId/followup-draft` | `src/api/trial-cases.ts` | 保存沟通草稿，不推进 TrialCase.status。仅 pending_followup / following_up。教师 403。 |
+| `/trial-cases/:trialCaseId/follow-ups` | `src/api/trial-cases.ts` | 提交跟进结果并追加 FollowUp。教师 403。 |
 | `/students/:studentId` | `src/api/students.ts` | 学生卡片与试听课程。管理员只能读自己负责的学生。 |
-| `/session-participants` | `src/api/session-participants.ts` | 当前教师待处理试听名单。管理员 403。 |
-| `/session-participants/:participantId` | `src/api/session-participants.ts` | 当前教师待处理的单条试听。不在名单中 404。 |
+| `/session-participants` | `src/api/session-participants.ts` | 当前教师名下已安排试听（含尚未上课）；`canProcess` 表示课次已结束、可以登记。管理员 403。 |
+| `/session-participants/:participantId` | `src/api/session-participants.ts` | 当前教师可处理的单条试听。尚未上课或不在名单中 404。 |
 | `/session-participants/:participantId/attendance` | `src/api/session-participants.ts` | 教师登记已到课或未到课。重复提交 409。 |
 
 ## HTTP 错误处理

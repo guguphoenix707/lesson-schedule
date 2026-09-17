@@ -24,3 +24,7 @@
   flex-direction: column;
   gap: 4px;
 }
+
+.processAction {
+  display: inline-block;
+}

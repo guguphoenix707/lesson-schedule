@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Table, Typography } from 'antd';
+import { Alert, Button, Table, Tag, Tooltip, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import { filter } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,12 @@ import {
 import type { TeacherTrialTask } from '../../../../api/session-participants';
 import { AppShell } from '../../../../components/app-shell';
 import { TrialQueryBanner } from '../../../../components/trial-query-banner';
-import { trialCaseStatusOptions } from '../../../../trial/labels';
+import { formatSessionTime } from '../../../../trial/format-session-time';
+import {
+  derivedSessionLabels,
+  trialCaseStatusLabels,
+  trialCaseStatusOptions,
+} from '../../../../trial/labels';
 import {
   emptyTrialQuery,
   isTrialQueryActive,
@@ -21,22 +26,6 @@ import type { TrialQueryBannerValue } from '../../../../trial/query';
 import styles from './index.module.css';
 
 const teacherTrialTablePageSize = 10;
-
-const melbourneDateTime = new Intl.DateTimeFormat('zh-CN', {
-  timeZone: 'Australia/Melbourne',
-  dateStyle: 'medium',
-  timeStyle: 'short',
-});
-
-const melbourneDate = new Intl.DateTimeFormat('zh-CN', {
-  timeZone: 'Australia/Melbourne',
-  dateStyle: 'medium',
-});
-
-const melbourneTime = new Intl.DateTimeFormat('zh-CN', {
-  timeZone: 'Australia/Melbourne',
-  timeStyle: 'short',
-});
 
 export function TeacherTrialTaskListPage() {
   const navigate = useNavigate();
@@ -74,7 +63,7 @@ export function TeacherTrialTaskListPage() {
             试听跟踪
           </Typography.Title>
           <Typography.Paragraph type="secondary">
-            只显示你授课、课次已结束且尚未登记结果的试听。未满足这些条件时不能处理。
+            显示你授课、尚未登记结果的已安排试听。课次结束后才能处理。
           </Typography.Paragraph>
         </div>
         <TrialQueryBanner
@@ -95,7 +84,7 @@ export function TeacherTrialTaskListPage() {
             locale={{
               emptyText: isTrialQueryActive(query)
                 ? '没有符合条件的试听'
-                : '暂无待处理的试听',
+                : '暂无已安排的试听',
             }}
             pagination={{
               current: page,
@@ -135,27 +124,48 @@ function createColumns(
       key: 'studentDisplayName',
     },
     {
+      title: '状态',
+      key: 'status',
+      render: (_value, record) =>
+        record.derivedSessionLabel ? (
+          <Tag>{derivedSessionLabels[record.derivedSessionLabel]}</Tag>
+        ) : (
+          trialCaseStatusLabels[record.status]
+        ),
+    },
+    {
       title: '操作',
       key: 'actions',
       render: (_value, record) => (
-        <Button
-          type="link"
-          onClick={() => {
+        <ProcessAction
+          canProcess={record.canProcess}
+          onProcess={() => {
             onProcess(record.id);
           }}
-        >
-          处理
-        </Button>
+        />
       ),
     },
   ];
 }
 
-function formatSessionTime(startsAt: string, endsAt: string): string {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-  if (melbourneDate.format(start) === melbourneDate.format(end)) {
-    return `${melbourneDateTime.format(start)} – ${melbourneTime.format(end)}`;
-  }
-  return `${melbourneDateTime.format(start)} – ${melbourneDateTime.format(end)}`;
+function ProcessAction({
+  canProcess,
+  onProcess,
+}: {
+  canProcess: boolean;
+  onProcess: () => void;
+}) {
+  return (
+    <Tooltip title={canProcess ? null : '课次尚未结束，暂时不能处理'}>
+      <span className={styles.processAction}>
+        <Button
+          disabled={!canProcess}
+          type="link"
+          onClick={onProcess}
+        >
+          处理
+        </Button>
+      </span>
+    </Tooltip>
+  );
 }

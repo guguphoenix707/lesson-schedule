@@ -14,7 +14,8 @@ export class SessionParticipantsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List ended trial bookings the current teacher must record',
+    summary:
+      'List scheduled trial bookings for the current teacher, including sessions not yet ended',
   })
   list(@CurrentUser() user: AuthenticatedUser) {
     return this.sessionParticipantsService.listPendingForTeacher(user);

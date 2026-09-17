@@ -66,7 +66,7 @@ psql -d class -v ON_ERROR_STOP=1 -f db/migrations/20260917080000_init_trial_slic
 | `ava.admin@example.com` | admin | Ava Chen | 名下 24 名未缴费学生，覆盖待安排 / 缺席重约 / 改期 / 待老师登记 / 待跟进 / 跟进中 / 待报名 / 已关闭 |
 | `ben.admin@example.com` | admin | Ben Walsh | 较小的顾问名单 |
 | `chen.admin@example.com` | admin | Chen Li | 含一条待老师登记 |
-| `lina.teacher@example.com` | teacher | Lina Park | Year 5 数学默认老师；含已结束课次、待提交试听结果 |
+| `lina.teacher@example.com` | teacher | Lina Park | Year 5 数学默认老师；含已结束待登记、以及尚未上课的已安排试听 |
 | `tom.teacher@example.com` | teacher | Tom Harris | Year 3 英语默认老师 |
 | `mei.teacher@example.com` | teacher | Mei Huang | Year 7 科学（周日）默认老师 |
 | `noah.teacher@example.com` | teacher | Noah Singh | Year 7 科学（周三）默认老师 |

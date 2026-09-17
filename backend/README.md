@@ -61,12 +61,15 @@ pnpm --filter @class/backend build
 - `GET /api/trial-tasklist`：当前管理员名下学生关联的试听流程列表。查询 `TrialCase`，并按 `student.owner_admin_id` 限定为当前管理员；教师 403。
 - `GET /api/trial-cases/:trialCaseId/schedulable-sessions`：该试听可安排的未来课次（未取消、未开始，且该学生尚未有该课次记录），以及关联学生的 `id` / `displayName`。教师 403。
 - `POST /api/trial-cases/:trialCaseId/schedule`：为 `pending_schedule` 的试听安排已有课次。事务内锁定 TrialCase，写入 trial `SessionParticipant` 并将状态改为 `scheduled`。教师 403。
+- `GET /api/trial-cases/:trialCaseId`：当前管理员名下该试听的跟踪详情（沟通草稿、教师反馈、跟进历史）。教师 403。
+- `POST /api/trial-cases/:trialCaseId/followup-draft`：保存沟通草稿，不推进 `TrialCase.status`。仅 `pending_followup` / `following_up`。教师 403。
+- `POST /api/trial-cases/:trialCaseId/follow-ups`：提交跟进结果。事务内锁定 TrialCase，追加 FollowUp：未联系上/考虑中 → `following_up` 并写入未来 `next_followup_at`；有报名意向 → `interested`；暂不考虑 → `closed`。教师 403。重复提交不得把后续阶段重置。
 - `GET /api/students/:studentId`：学生与试听课程详情。管理员只能读 `owner_admin_id` 为自己的学生；教师 403。
 
 当前课次参与接口：
 
-- `GET /api/session-participants`：当前教师待处理试听名单（已安排、课次未取消且已结束、有效预约出勤仍为 pending）。管理员 403。
-- `GET /api/session-participants/:participantId`：当前教师待处理的单条试听。不在待处理名单中 404。
+- `GET /api/session-participants`：当前教师名下已安排试听（课次未取消、有效预约出勤仍为 pending）。含尚未上课的记录，此时 `canProcess` 为 false；课次结束后为 true。管理员 403。
+- `GET /api/session-participants/:participantId`：当前教师可处理的单条试听（课次已结束）。尚未上课或不在名单中 404。
 - `POST /api/session-participants/:participantId/attendance`：教师登记已到课（含反馈）或未到课。事务内锁定 TrialCase；已到课 → pending_followup，未到课 → pending_schedule。重复提交 409。
 
 不开放注册。演示账号与密码以 `db/README.md` 为准。

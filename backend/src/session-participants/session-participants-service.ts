@@ -10,6 +10,7 @@ import type { AppAbility } from '../auth/ability';
 import { accessibleBy, createAbilityFor } from '../auth/ability';
 import type { AuthenticatedUser } from '../auth/session-guard';
 import { PrismaService } from '../prisma-service';
+import { derivedSessionLabel } from '../trial/trial-case-view';
 
 type PresentAttendance = {
   attendance: 'present';
@@ -40,6 +41,7 @@ const participantTaskSelect = {
       id: true,
       startsAt: true,
       endsAt: true,
+      status: true,
       class: { select: { name: true } },
     },
   },
@@ -52,7 +54,7 @@ export class SessionParticipantsService {
   async listPendingForTeacher(user: AuthenticatedUser) {
     const ability = this.requireParticipantAction(user, 'read');
     const participants = await this.prisma.client.sessionParticipant.findMany({
-      where: pendingProcessWhere(ability, user.id),
+      where: teacherAssignedTrialWhere(ability, user.id),
       orderBy: [
         { session: { endsAt: 'asc' } },
         { student: { displayName: 'asc' } },
@@ -197,7 +199,7 @@ export class SessionParticipantsService {
   }
 }
 
-function pendingProcessWhere(
+function teacherAssignedTrialWhere(
   ability: AppAbility,
   teacherId: string,
   participantId?: string,
@@ -214,9 +216,21 @@ function pendingProcessWhere(
         session: {
           assignedTeacherId: teacherId,
           status: { not: 'cancelled' },
-          endsAt: { lte: new Date() },
         },
       },
+    ],
+  };
+}
+
+function pendingProcessWhere(
+  ability: AppAbility,
+  teacherId: string,
+  participantId?: string,
+): Prisma.SessionParticipantWhereInput {
+  return {
+    AND: [
+      teacherAssignedTrialWhere(ability, teacherId, participantId),
+      { session: { endsAt: { lte: new Date() } } },
     ],
   };
 }
@@ -226,12 +240,18 @@ function toTeacherTrialTask(
     select: typeof participantTaskSelect;
   }>,
 ) {
+  const derivedLabel = derivedSessionLabel(
+    participant.trialCase.status,
+    participant.session,
+  );
   return {
     id: participant.id,
     studentId: participant.studentId,
     studentDisplayName: participant.student.displayName,
     trialCaseId: participant.trialCaseId,
     status: participant.trialCase.status,
+    derivedSessionLabel: derivedLabel,
+    canProcess: derivedLabel === 'awaiting_teacher_result',
     session: {
       id: participant.session.id,
       startsAt: participant.session.startsAt.toISOString(),

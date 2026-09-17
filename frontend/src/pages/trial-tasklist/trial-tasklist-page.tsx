@@ -180,6 +180,15 @@ function createColumns(
               <Button
                 key={action}
                 danger={action === 'cancel'}
+                href={
+                  action === 'follow_up'
+                    ? `/trial-followup/${record.id}`
+                    : undefined
+                }
+                rel={
+                  action === 'follow_up' ? 'noopener noreferrer' : undefined
+                }
+                target={action === 'follow_up' ? '_blank' : undefined}
                 type="link"
                 onClick={() => {
                   if (action === 'schedule') {

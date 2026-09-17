@@ -12,6 +12,7 @@ import { LoginRoute } from './pages/login/login-route';
 import { ScheduleTrialPage } from './pages/schedule-trial/schedule-trial-page';
 import { TeacherTrialTaskListPage } from './pages/teacher/trial-task/list';
 import { TeacherTrialProcessPage } from './pages/teacher/trial-task/process';
+import { TrialFollowupPage } from './pages/trial-followup/trial-followup-page';
 import { TrialTasklistPage } from './pages/trial-tasklist/trial-tasklist-page';
 import { AdminGuard } from './routes/admin-guard';
 import { AuthGuard } from './routes/auth-guard';
@@ -52,6 +53,10 @@ export function App() {
                   <Route
                     path="/scheduleTrial/:trialID"
                     element={<ScheduleTrialPage />}
+                  />
+                  <Route
+                    path="/trial-followup/:trialID"
+                    element={<TrialFollowupPage />}
                   />
                 </Route>
                 <Route element={<TeacherGuard />}>
