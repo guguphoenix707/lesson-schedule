@@ -9,20 +9,25 @@ class/
 ├── .cursor/rules/
 ├── frontend/
 │   ├── README.md
+│   ├── package.json
 │   ├── eslint.config.js
 │   ├── .prettierrc.json
 │   ├── .prettierignore
 │   ├── .editorconfig
 │   ├── design/rule.md
+│   ├── design/trial-journey/
 │   ├── src/
 │   └── tests/
 ├── backend/
 │   ├── README.md
+│   ├── package.json
+│   ├── prisma.config.ts
 │   ├── design/rule.md
 │   ├── src/
 │   └── tests/
 ├── db/
 │   ├── README.md
+│   ├── schema.prisma
 │   ├── migrations/
 │   └── seed/
 ├── docs/
@@ -37,16 +42,25 @@ class/
 ├── scripts/
 │   └── README.md
 ├── index.js             # 初始化前已有文件，未读取或修改
-└── package.json         # 初始化前已有文件，未读取或修改
+├── package.json         # pnpm workspace 根，packageManager 为 pnpm
+├── pnpm-workspace.yaml
+└── pnpm-lock.yaml
 ```
 
 ## 组织原则
 
-仓库参考前端、后端、数据、文档、评估相互隔离的组织方式，但不通过目录预设具体技术选型。只有在需求明确后，才增加语言、框架、依赖、构建、部署和持续集成配置。
+仓库按前端、后端、数据、文档、评估隔离。已确认选型见下表。未实现的能力不得写成已经完成。
 
-`frontend/` 已按要求复用参考项目的 ESLint、Prettier 和 EditorConfig 约束；相关工具依赖与执行脚本尚未安装或写入 `package.json`。
+现有根目录业务文件保持原位。是否迁入某个模块，应在了解其职责并确认目标结构后单独处理。
 
-现有根目录业务文件在本次初始化中保持原位。是否迁入某个模块，应在了解其职责并确认目标结构后单独处理。
+## 已确认技术选型
+
+| 层 | 选择 | 约束 |
+|---|---|---|
+| 前端 | Vite + React + TypeScript SPA，Ant Design | 本期不引入 Next.js。界面不作为权限或业务规则的唯一防线。依赖声明见 `frontend/package.json`。 |
+| 后端 | Node.js + TypeScript + NestJS | 登录会话用 Better Auth；权限判定用 CASL，在服务端强制。 |
+| 数据 | PostgreSQL + Prisma 7 | Schema 以 `db/schema.prisma` 为准；迁移由 Prisma 写入 `db/migrations/`。应用代码不放在 `db/`。 |
+| 包管理 | pnpm workspace | 只用 pnpm；锁文件为 `pnpm-lock.yaml`。禁止 npm / yarn 安装或生成 `package-lock.json` / `yarn.lock`。 |
 
 ## 目录职责
 
@@ -69,4 +83,4 @@ class/
 - 文档只描述真实存在的结构；计划项明确标注为计划。
 - 根目录只放项目级入口和全局配置，模块专属配置归入对应模块。
 - 不创建与现有目录职责重叠的新根目录。
-- 技术选型确定后，在对应模块文档中记录选择、版本范围和验证命令。
+- 选型变更时同步对应模块 README。只记录影响边界的决策，不为安装依赖单独写说明。

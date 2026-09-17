@@ -10,6 +10,13 @@ Thumbs.db
 !.env.example
 *.local
 
+# Dependencies and generated clients
+node_modules/
+.prisma/
+backend/generated/
+package-lock.json
+yarn.lock
+
 # Logs, caches, coverage and generated output
 *.log
 .cache/
@@ -18,5 +25,6 @@ dist/
 build/
 tmp/
 temp/
+*.tsbuildinfo
 
 

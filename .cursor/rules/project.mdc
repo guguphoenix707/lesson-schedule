@@ -7,3 +7,6 @@ alwaysApply: true
 
 开始任务前阅读并遵守根目录 `AGENTS.md`。不要以本文件或其他摘要替代正文。
 
+包管理只用 pnpm。不以 npm 或 yarn 安装依赖，不生成 `package-lock.json` 或 `yarn.lock`。
+
+

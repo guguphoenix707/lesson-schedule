@@ -1,0 +1,199 @@
+// Period 1 trial slice. Later modules: ScheduleRule, Enrollment, CreditAccount,
+// CreditEntry, Parent / StudentGuardian. Do not treat those as existing tables.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../backend/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  teacher
+}
+
+enum ClassSessionStatus {
+  scheduled
+  completed
+  cancelled
+}
+
+enum TrialCaseStatus {
+  pending_schedule
+  scheduled
+  pending_followup
+  following_up
+  interested
+  closed
+}
+
+enum SessionKind {
+  trial
+}
+
+enum BookingStatus {
+  booked
+  cancelled
+}
+
+enum AttendanceStatus {
+  pending
+  present
+  absent
+}
+
+enum FollowUpOutcome {
+  unreachable
+  considering
+  interested
+  not_interested
+}
+
+/// Staff login identity. Admin and teacher share one table.
+model User {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique
+  displayName  String   @map("display_name")
+  role         UserRole
+  /// Local/demo hash until Better Auth owns credentials.
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  ownedStudents     Student[]            @relation("StudentOwner")
+  defaultClasses    Class[]              @relation("ClassDefaultTeacher")
+  plannedSessions   ClassSession[]       @relation("SessionPlannedTeacher")
+  assignedSessions  ClassSession[]       @relation("SessionAssignedTeacher")
+  authoredFollowUps FollowUp[]           @relation("FollowUpAuthor")
+
+  @@map("users")
+}
+
+/// Student facts and current owner. Trial workflow status is on TrialCase.
+model Student {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName   String   @map("display_name")
+  yearLevel     String?  @map("year_level")
+  guardianName  String?  @map("guardian_name")
+  /// Full number for the expanded student card. UI must mask until opened.
+  phone         String?
+  notes         String?
+  ownerAdminId  String   @map("owner_admin_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  ownerAdmin   User                  @relation("StudentOwner", fields: [ownerAdminId], references: [id], onDelete: Restrict)
+  trialCase    TrialCase?
+  participants SessionParticipant[]
+
+  @@index([ownerAdminId])
+  @@map("students")
+}
+
+model Course {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  classes   Class[]
+
+  @@map("courses")
+}
+
+model Class {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  courseId         String   @map("course_id") @db.Uuid
+  defaultTeacherId String   @map("default_teacher_id") @db.Uuid
+  name             String   @unique
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  course         Course         @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  defaultTeacher User           @relation("ClassDefaultTeacher", fields: [defaultTeacherId], references: [id], onDelete: Restrict)
+  sessions       ClassSession[]
+
+  @@index([courseId])
+  @@index([defaultTeacherId])
+  @@map("classes")
+}
+
+/// One dated lesson. Substitute teaching changes assignedTeacherId only.
+model ClassSession {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classId           String             @map("class_id") @db.Uuid
+  startsAt          DateTime           @map("starts_at") @db.Timestamptz(6)
+  endsAt            DateTime           @map("ends_at") @db.Timestamptz(6)
+  plannedTeacherId  String             @map("planned_teacher_id") @db.Uuid
+  assignedTeacherId String             @map("assigned_teacher_id") @db.Uuid
+  status            ClassSessionStatus @default(scheduled)
+  cancelReason      String?            @map("cancel_reason")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  class           Class                @relation(fields: [classId], references: [id], onDelete: Restrict)
+  plannedTeacher  User                 @relation("SessionPlannedTeacher", fields: [plannedTeacherId], references: [id], onDelete: Restrict)
+  assignedTeacher User                 @relation("SessionAssignedTeacher", fields: [assignedTeacherId], references: [id], onDelete: Restrict)
+  participants    SessionParticipant[]
+
+  @@index([classId])
+  @@index([assignedTeacherId, endsAt])
+  @@map("class_sessions")
+}
+
+/// One trial workflow per student. Created at signup, before any session.
+model TrialCase {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId      String          @unique @map("student_id") @db.Uuid
+  status         TrialCaseStatus
+  nextFollowupAt DateTime?       @map("next_followup_at") @db.Timestamptz(6)
+  /// Admin communication draft. Saving it must not advance status.
+  followupDraft  String?         @map("followup_draft")
+  closedReason   String?         @map("closed_reason")
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  student      Student               @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  participants SessionParticipant[]
+  followUps    FollowUp[]
+
+  @@index([status])
+  @@map("trial_cases")
+}
+
+/// One student on one session roster. This period only inserts kind=trial.
+model SessionParticipant {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId      String           @map("student_id") @db.Uuid
+  sessionId      String           @map("session_id") @db.Uuid
+  trialCaseId    String           @map("trial_case_id") @db.Uuid
+  kind           SessionKind      @default(trial)
+  bookingStatus  BookingStatus    @default(booked) @map("booking_status")
+  attendance     AttendanceStatus @default(pending)
+  /// present: {performance, fit_suggestion, questions_for_admin?}; absent: {absent_note?}
+  teacherFeedback Json?           @map("teacher_feedback")
+  cancelledAt    DateTime?        @map("cancelled_at") @db.Timestamptz(6)
+  cancelReason   String?          @map("cancel_reason")
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  student   Student      @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  session   ClassSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  trialCase TrialCase    @relation(fields: [trialCaseId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionId, studentId])
+  @@index([studentId])
+  @@index([trialCaseId])
+  @@map("session_participants")
+}
+
+model FollowUp {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trialCaseId    String          @map("trial_case_id") @db.Uuid
+  authorAdminId  String          @map("author_admin_id") @db.Uuid
+  outcome        FollowUpOutcome
+  summary        String?
+  nextFollowupAt DateTime?       @map("next_followup_at") @db.Timestamptz(6)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  trialCase   TrialCase @relation(fields: [trialCaseId], references: [id], onDelete: Restrict)
+  authorAdmin User      @relation("FollowUpAuthor", fields: [authorAdminId], references: [id], onDelete: Restrict)
+
+  @@index([trialCaseId, createdAt(sort: Desc)])
+  @@map("follow_ups")
+}

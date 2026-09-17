@@ -2,18 +2,50 @@
 
 本目录负责服务端接口、业务流程编排、可信环境中的规则执行和外部系统适配。
 
+## 当前选型
+
+已确认并安装（pnpm workspace `@class/backend`）：
+
+- Node.js + NestJS 12（Fastify 适配器）
+- `@nestjs/swagger`
+- Better Auth
+- CASL（`@casl/ability`、`@casl/prisma`）
+- Prisma 7 + `@prisma/adapter-pg` + `pg`，数据库为 PostgreSQL
+
+Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。
+
 ## 边界
 
 - 不包含用户界面实现或前端构建产物。
 - 数据访问通过清晰边界组织，不把存储细节泄漏到接口层。
 - 外部服务调用集中处理超时、错误、重试和可观测性。
-- 语言、框架、运行时和存储方案在需求明确后选择。
+- 权限校验默认在可信服务端执行。
 
 ## 约定结构
 
 - `src/`：实现代码。
 - `tests/`：模块测试、集成测试和契约测试。
 - `design/`：本模块的架构、接口和编码约定。
+- `prisma.config.ts`：Prisma CLI 配置（连接串、schema / 迁移路径）。
+
+## 验证命令
+
+在仓库根目录：
+
+```bash
+pnpm install
+cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串，不要提交
+pnpm --filter @class/backend start:dev
+pnpm --filter @class/backend build
+```
+
+开发环境 Swagger UI：`http://localhost:3000/api/docs`。
+
+Prisma：
+
+```bash
+pnpm --filter @class/backend prisma:generate
+pnpm --filter @class/backend prisma:migrate
+```
 
 修改实现前先阅读 `design/rule.md`。
-

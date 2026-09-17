@@ -1,10 +1,14 @@
 {
   "name": "class",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Student management system workspace",
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "private": true
+    "dev:frontend": "pnpm --filter @class/frontend dev",
+    "dev:backend": "pnpm --filter @class/backend start:dev",
+    "lint:frontend": "pnpm --filter @class/frontend lint",
+    "build:frontend": "pnpm --filter @class/frontend build",
+    "build:backend": "pnpm --filter @class/backend build"
+  }
 }
