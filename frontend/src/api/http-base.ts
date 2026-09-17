@@ -17,6 +17,14 @@ export function isHttpUnauthorized(error: unknown): boolean {
   return axios.isAxiosError(error) && error.response?.status === 401;
 }
 
+export function isHttpForbidden(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 403;
+}
+
+export function isHttpNotFound(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 404;
+}
+
 export function getHttpErrorMessage(error: unknown, fallback: string): string {
   if (!axios.isAxiosError(error)) {
     if (error instanceof Error && error.message.length > 0) {

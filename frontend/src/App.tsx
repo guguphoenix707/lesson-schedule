@@ -4,6 +4,8 @@ import type { ThemeConfig } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/home/home-page';
 import { LoginRoute } from './pages/login/login-route';
+import { TrialTasklistPage } from './pages/trial-tasklist/trial-tasklist-page';
+import { AdminGuard } from './routes/admin-guard';
 import { AuthGuard } from './routes/auth-guard';
 
 const queryClient = new QueryClient();
@@ -32,6 +34,12 @@ export function App() {
               <Route path="/login" element={<LoginRoute />} />
               <Route element={<AuthGuard />}>
                 <Route path="/" element={<HomePage />} />
+                <Route element={<AdminGuard />}>
+                  <Route
+                    path="/trial-tasklist"
+                    element={<TrialTasklistPage />}
+                  />
+                </Route>
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

@@ -2,7 +2,8 @@ import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App, Button, Checkbox, Form, Input, Typography } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { sessionQueryKey, signInWithEmail } from '../../api/auth';
+import { fetchCurrentSession, sessionQueryKey, signInWithEmail } from '../../api/auth';
+import { homePathFor } from '../../auth/home-path';
 import { Brand } from '../../components/brand';
 import styles from './login-page.module.css';
 
@@ -26,8 +27,13 @@ export function LoginPage() {
   const signInMutation = useMutation({
     mutationFn: signInWithEmail,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
-      navigate(locationState?.from ?? '/', { replace: true });
+      const session = await queryClient.fetchQuery({
+        queryKey: sessionQueryKey,
+        queryFn: fetchCurrentSession,
+      });
+      const fallback = session ? homePathFor(session.role) : '/';
+      const from = locationState?.from;
+      navigate(from && from !== '/login' ? from : fallback, { replace: true });
     },
     onError: (error: Error) => {
       message.error(error.message);

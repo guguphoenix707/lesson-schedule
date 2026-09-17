@@ -56,6 +56,11 @@ pnpm --filter @class/backend build
 
 业务接口默认先校验会话，再按角色鉴权（本期仅 `admin` / `teacher`）。公开接口只放在 `/api/common`。不提供 `GET /api/me`。
 
+当前学生接口：
+
+- `GET /api/students`：管理员名下带试听流程的学生任务列表。教师 403。
+- `GET /api/students/:studentId`：学生与试听课程详情。管理员只能读 `owner_admin_id` 为自己的学生；教师 403。
+
 不开放注册。演示账号与密码以 `db/README.md` 为准。
 
 Prisma：
