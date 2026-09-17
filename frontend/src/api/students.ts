@@ -1,10 +1,4 @@
-import {
-  getHttpErrorMessage,
-  httpBase,
-  isHttpForbidden,
-  isHttpNotFound,
-  isHttpUnauthorized,
-} from './http-base';
+import { httpBase } from './http-base';
 
 export type TrialCaseStatus =
   | 'pending_schedule'
@@ -64,23 +58,8 @@ export function studentQueryKey(studentId: string) {
 }
 
 export async function fetchStudent(studentId: string): Promise<StudentDetail> {
-  try {
-    const { data } = await httpBase.get<StudentDetail>(
-      `/students/${studentId}`,
-    );
-    return data;
-  } catch (error) {
-    if (isHttpUnauthorized(error)) {
-      throw new Error('请先登录', { cause: error });
-    }
-    if (isHttpForbidden(error)) {
-      throw new Error('没有权限查看该学生', { cause: error });
-    }
-    if (isHttpNotFound(error)) {
-      throw new Error('学生不存在或不在你的名单中', { cause: error });
-    }
-    throw new Error(getHttpErrorMessage(error, '无法加载学生信息'), {
-      cause: error,
-    });
-  }
+  const { data } = await httpBase.get<StudentDetail>(
+    `/students/${studentId}`,
+  );
+  return data;
 }

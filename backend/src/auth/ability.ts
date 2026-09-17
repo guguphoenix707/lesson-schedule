@@ -14,6 +14,7 @@ export function createAbilityFor(user: AuthenticatedUser): AppAbility {
   if (user.role === 'admin') {
     can('read', 'Student', { ownerAdminId: user.id });
     can('read', 'TrialCase', { student: { ownerAdminId: user.id } });
+    can('update', 'TrialCase', { student: { ownerAdminId: user.id } });
   }
 
   if (user.role === 'teacher') {

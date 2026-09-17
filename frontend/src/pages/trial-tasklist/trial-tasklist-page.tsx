@@ -12,6 +12,7 @@ import type { TrialTasklistItem } from '../../api/trial-tasklist';
 import { AppShell } from '../../components/app-shell';
 import { StudentInfo } from '../../components/student-info';
 import { TrialQueryBanner } from '../../components/trial-query-banner';
+import { formatSessionTime } from '../../trial/format-session-time';
 import {
   derivedSessionLabels,
   trialAdminActionLabels,
@@ -25,6 +26,7 @@ import {
   matchesTrialQuery,
 } from '../../trial/query';
 import type { TrialQueryBannerValue } from '../../trial/query';
+import { ScheduleTrialModal } from './components/schedule-trial-modal';
 import styles from './trial-tasklist-page.module.css';
 
 const trialTablePageSize = 10;
@@ -33,6 +35,10 @@ export function TrialTasklistPage() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null,
   );
+  const [scheduling, setScheduling] = useState<{
+    trialCaseId: string;
+    studentName: string;
+  } | null>(null);
   const [query, setQuery] = useState<TrialQueryBannerValue>(emptyTrialQuery);
   const [page, setPage] = useState(1);
   const tasklistQuery = useQuery({
@@ -40,7 +46,7 @@ export function TrialTasklistPage() {
     queryFn: fetchTrialTasklist,
   });
   const columns = useMemo(
-    () => createColumns(setSelectedStudentId),
+    () => createColumns(setSelectedStudentId, setScheduling),
     [],
   );
   const filteredItems = useMemo(() => {
@@ -93,10 +99,18 @@ export function TrialTasklistPage() {
               onChange: setPage,
             }}
             rowKey="id"
-            scroll={{ x: 720 }}
+            scroll={{ x: 920 }}
           />
         )}
       </main>
+      <ScheduleTrialModal
+        open={scheduling !== null}
+        studentName={scheduling?.studentName ?? ''}
+        trialCaseId={scheduling?.trialCaseId ?? null}
+        onClose={() => {
+          setScheduling(null);
+        }}
+      />
       <Drawer
         destroyOnHidden
         open={selectedStudentId !== null}
@@ -117,6 +131,7 @@ export function TrialTasklistPage() {
 
 function createColumns(
   onOpenStudent: (studentId: string) => void,
+  onSchedule: (item: { trialCaseId: string; studentName: string }) => void,
 ): TableProps<TrialTasklistItem>['columns'] {
   return [
     {
@@ -149,6 +164,26 @@ function createColumns(
       ),
     },
     {
+      title: '试听安排',
+      key: 'arrangement',
+      render: (_value, record) => {
+        if (!record.arrangement) {
+          return '—';
+        }
+        return (
+          <div className={styles.arrangement}>
+            <span>{record.arrangement.courseName}</span>
+            <Typography.Text type="secondary">
+              {formatSessionTime(
+                record.arrangement.startsAt,
+                record.arrangement.endsAt,
+              )}
+            </Typography.Text>
+          </div>
+        );
+      },
+    },
+    {
       title: '操作',
       key: 'actions',
       render: (_value, record) => {
@@ -162,6 +197,14 @@ function createColumns(
                 key={action}
                 danger={action === 'cancel'}
                 type="link"
+                onClick={() => {
+                  if (action === 'schedule') {
+                    onSchedule({
+                      trialCaseId: record.id,
+                      studentName: record.student.displayName,
+                    });
+                  }
+                }}
               >
                 {trialAdminActionLabels[action]}
               </Button>

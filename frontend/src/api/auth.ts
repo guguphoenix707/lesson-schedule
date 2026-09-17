@@ -1,4 +1,4 @@
-import { getHttpErrorMessage, httpBase, isHttpUnauthorized } from './http-base';
+import { httpBase } from './http-base';
 
 export type StaffSession = {
   id: string;
@@ -19,17 +19,8 @@ type AuthSessionResponse = {
 } | null;
 
 export async function fetchCurrentSession(): Promise<StaffSession | null> {
-  try {
-    const { data } = await httpBase.get<AuthSessionResponse>('/auth/get-session');
-    return toStaffSession(data);
-  } catch (error) {
-    if (isHttpUnauthorized(error)) {
-      return null;
-    }
-    throw new Error(getHttpErrorMessage(error, '无法读取当前登录状态'), {
-      cause: error,
-    });
-  }
+  const { data } = await httpBase.get<AuthSessionResponse>('/auth/get-session');
+  return toStaffSession(data);
 }
 
 function toStaffSession(data: AuthSessionResponse): StaffSession | null {
@@ -51,28 +42,13 @@ export async function signInWithEmail(input: {
   password: string;
   remember?: boolean;
 }): Promise<void> {
-  try {
-    await httpBase.post('/auth/sign-in/email', {
-      email: input.email,
-      password: input.password,
-      rememberMe: Boolean(input.remember),
-    });
-  } catch (error) {
-    if (isHttpUnauthorized(error)) {
-      throw new Error('邮箱或密码不正确', { cause: error });
-    }
-    throw new Error(getHttpErrorMessage(error, '登录失败，请稍后重试'), {
-      cause: error,
-    });
-  }
+  await httpBase.post('/auth/sign-in/email', {
+    email: input.email,
+    password: input.password,
+    rememberMe: Boolean(input.remember),
+  });
 }
 
 export async function signOut(): Promise<void> {
-  try {
-    await httpBase.post('/auth/sign-out', {});
-  } catch (error) {
-    throw new Error(getHttpErrorMessage(error, '退出登录失败'), {
-      cause: error,
-    });
-  }
+  await httpBase.post('/auth/sign-out', {});
 }

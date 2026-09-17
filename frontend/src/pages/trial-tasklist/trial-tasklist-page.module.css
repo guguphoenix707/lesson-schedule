@@ -23,3 +23,9 @@
   padding: 0;
   height: auto;
 }
+
+.arrangement {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

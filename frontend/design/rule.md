@@ -28,10 +28,35 @@
 | `/auth/*` | `src/api/auth.ts` | 登录、退出、读会话。未登录时 `get-session` 为 `null`。 |
 | `/common/*` | 对应公开接口客户端 | 不依赖登录。 |
 | `/trial-tasklist` | `src/api/trial-tasklist.ts` | 当前管理员名下学生关联的试听流程列表。教师 403。 |
+| `/trial-cases/:trialCaseId/schedulable-sessions` | `src/api/trial-cases.ts` | 该试听可安排的未来课次。教师 403。 |
+| `/trial-cases/:trialCaseId/schedule` | `src/api/trial-cases.ts` | 为待安排试听选择已有课次。教师 403。 |
 | `/students/:studentId` | `src/api/students.ts` | 学生卡片与试听课程。管理员只能读自己负责的学生。 |
 | `/session-participants` | `src/api/session-participants.ts` | 当前教师待处理试听名单。管理员 403。 |
 | `/session-participants/:participantId` | `src/api/session-participants.ts` | 当前教师待处理的单条试听。不在名单中 404。 |
 | `/session-participants/:participantId/attendance` | `src/api/session-participants.ts` | 教师登记已到课或未到课。重复提交 409。 |
+
+## HTTP 错误处理
+
+HTTP 状态码只在 `httpBase` 响应拦截器处理，这是唯一收口。业务 API、页面和组件不得用 `isHttpUnauthorized`、`error.response.status === 401` 等判断 401 / 403 / 404 / 409 / 400。
+
+拦截器负责：
+
+- 把失败响应转成带中文的 `Error` 再拒绝；调用方只读 `error.message`。
+- `GET /auth/get-session` 的 401 当成未登录，返回 `data: null`，不抛错。
+- `POST /auth/sign-in/email` 的 401 固定为「邮箱或密码不正确」。
+- 其余 401 为「请先登录」；403 / 404 / 409 / 400 / 5xx 优先用服务端文案，没有或是 Nest 默认英文再用通用提示。
+- 无响应时区分超时（「请求超时，请稍后重试」）和断连（「无法连接服务，请稍后重试」）。
+
+业务模块只发请求和取数据：
+
+```ts
+export async function fetchStudent(studentId: string): Promise<StudentDetail> {
+  const { data } = await httpBase.get<StudentDetail>(`/students/${studentId}`);
+  return data;
+}
+```
+
+不要在业务模块里按状态码分支，也不要把 `isHttpUnauthorized` 这类辅助函数导出给业务层。需要改某类 HTTP 错误的文案或行为时，只改 `src/api/http-base.ts`。
 
 ## Ant Design
 

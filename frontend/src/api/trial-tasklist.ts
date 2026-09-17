@@ -1,9 +1,4 @@
-import {
-  getHttpErrorMessage,
-  httpBase,
-  isHttpForbidden,
-  isHttpUnauthorized,
-} from './http-base';
+import { httpBase } from './http-base';
 import type {
   DerivedSessionLabel,
   TrialAdminAction,
@@ -20,6 +15,11 @@ export type TrialTasklistItem = {
     id: string;
     displayName: string;
   };
+  arrangement: {
+    courseName: string;
+    startsAt: string;
+    endsAt: string;
+  } | null;
 };
 
 export const trialTasklistQueryKey = ['trial-tasklist'] as const;
@@ -29,20 +29,8 @@ type TrialTasklistResponse = {
 };
 
 export async function fetchTrialTasklist(): Promise<TrialTasklistItem[]> {
-  try {
-    const { data } = await httpBase.get<TrialTasklistResponse>(
-      '/trial-tasklist',
-    );
-    return data.items;
-  } catch (error) {
-    if (isHttpUnauthorized(error)) {
-      throw new Error('请先登录', { cause: error });
-    }
-    if (isHttpForbidden(error)) {
-      throw new Error('没有权限查看试听待办', { cause: error });
-    }
-    throw new Error(getHttpErrorMessage(error, '无法加载试听待办'), {
-      cause: error,
-    });
-  }
+  const { data } = await httpBase.get<TrialTasklistResponse>(
+    '/trial-tasklist',
+  );
+  return data.items;
 }

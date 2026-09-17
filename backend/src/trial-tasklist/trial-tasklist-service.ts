@@ -26,12 +26,24 @@ export class TrialTasklistService {
           select: { id: true, displayName: true },
         },
         participants: {
-          where: { bookingStatus: 'booked', attendance: 'pending' },
+          where: {
+            bookingStatus: 'booked',
+            attendance: { in: ['pending', 'present'] },
+          },
           orderBy: { createdAt: 'desc' },
-          take: 1,
           select: {
+            attendance: true,
             session: {
-              select: { endsAt: true, status: true },
+              select: {
+                startsAt: true,
+                endsAt: true,
+                status: true,
+                class: {
+                  select: {
+                    course: { select: { name: true } },
+                  },
+                },
+              },
             },
           },
         },
@@ -40,7 +52,9 @@ export class TrialTasklistService {
 
     return {
       items: trialCases.map((trialCase) => {
-        const pendingSession = trialCase.participants[0]?.session;
+        const pendingSession = trialCase.participants.find(
+          (participant) => participant.attendance === 'pending',
+        )?.session;
         return {
           id: trialCase.id,
           status: trialCase.status,
@@ -51,6 +65,7 @@ export class TrialTasklistService {
           nextFollowupAt: trialCase.nextFollowupAt?.toISOString() ?? null,
           allowedActions: allowedAdminActions(trialCase.status),
           student: trialCase.student,
+          arrangement: toArrangement(trialCase.status, trialCase.participants),
         };
       }),
     };
@@ -63,4 +78,36 @@ export class TrialTasklistService {
     }
     return ability;
   }
+}
+
+type BookedParticipant = {
+  attendance: 'pending' | 'present' | 'absent';
+  session: {
+    startsAt: Date;
+    endsAt: Date;
+    status: 'scheduled' | 'completed' | 'cancelled';
+    class: { course: { name: string } };
+  };
+};
+
+function toArrangement(
+  status: string,
+  participants: BookedParticipant[],
+) {
+  const pending = participants.find(
+    (participant) => participant.attendance === 'pending',
+  );
+  const present = participants.find(
+    (participant) => participant.attendance === 'present',
+  );
+  const chosen = status === 'scheduled' ? pending : (present ?? pending);
+  if (!chosen || chosen.session.status === 'cancelled') {
+    return null;
+  }
+
+  return {
+    courseName: chosen.session.class.course.name,
+    startsAt: chosen.session.startsAt.toISOString(),
+    endsAt: chosen.session.endsAt.toISOString(),
+  };
 }
