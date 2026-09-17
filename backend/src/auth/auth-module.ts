@@ -3,7 +3,7 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { fromNodeHeaders } from 'better-auth/node';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { auth } from './auth';
-import { MeController } from './me.controller';
+import { MeController } from './me-controller';
 
 function firstHeader(
   value: string | string[] | undefined,
@@ -81,7 +81,7 @@ export class AuthModule implements OnModuleInit {
 
     fastify.route({
       method: [...methods],
-      url: '/api/auth/*path',
+      url: '/api/auth/*',
       handler: handleAuthRequest,
     });
     fastify.route({

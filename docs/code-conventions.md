@@ -10,6 +10,8 @@
 ## 命名与结构
 
 - 名称表达用途和领域含义，避免无意义缩写、临时编号和误导性命名。
+- 手写源码的文件名和目录名一律 kebab-case，只使用小写字母、数字和连字符，例如 `login-page.tsx`、`auth-module.ts`。禁止 PascalCase、camelCase 或大写字母。导出的类型、函数和类名仍按语言习惯（如 React 组件用 PascalCase）。
+- 工具链或生成物的固定文件名除外：`README.md`、`AGENTS.md`、`SKILL.md`、`package.json`、Prisma `schema.prisma` / `prisma.config.ts`、已应用的 `db/migrations/`、以及 Vite/TS/ESLint 等配置文件。不把例外扩散到业务源码。
 - 函数、类和模块保持单一职责；当一段代码需要多次使用“并且”描述职责时，应考虑拆分。
 - 公共抽象只包含真正稳定且共享的部分；相似但会独立变化的代码不强行合并。
 - 常量替代散落的魔法值；有限取值采用当前语言中清晰、可校验的表达方式。

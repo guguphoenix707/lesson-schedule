@@ -1,0 +1,7 @@
+.status {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: var(--app-color-layout);
+}

@@ -21,6 +21,14 @@
 ## 安装与运行
 
 ```bash
+./scripts/dev.sh
+```
+
+需要 Docker。没有 `backend/.env` 时会从 example 写入，并拉起 `db/docker-compose.yml` 的 Postgres（宿主机端口 `55432`）。空库会执行迁移和演示种子。Ctrl+C 只停止本次拉起的进程。
+
+也可以拆开跑：
+
+```bash
 pnpm install
 cp backend/.env.example backend/.env
 pnpm dev:frontend

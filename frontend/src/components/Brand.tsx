@@ -1,4 +1,4 @@
-import styles from './Brand.module.css';
+import styles from './brand.module.css';
 
 export function Brand() {
   return (

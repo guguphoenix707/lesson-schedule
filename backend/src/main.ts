@@ -1,12 +1,22 @@
 import 'reflect-metadata';
+import os from 'node:os';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   type NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+import { AppModule } from './app-module';
 import { env } from './env';
+
+const listNetworkInterfaces = os.networkInterfaces.bind(os);
+os.networkInterfaces = () => {
+  try {
+    return listNetworkInterfaces();
+  } catch {
+    return {};
+  }
+};
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -23,7 +33,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(env.port, '0.0.0.0');
+  await app.listen(env.port, '127.0.0.1');
 }
 
 void bootstrap();

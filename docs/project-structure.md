@@ -37,6 +37,7 @@ class/
 ├── db/
 │   ├── README.md
 │   ├── schema.prisma
+│   ├── docker-compose.yml
 │   ├── migrations/
 │   └── seed/
 ├── docs/
@@ -49,7 +50,9 @@ class/
 │   ├── cases/
 │   └── results/
 ├── scripts/
-│   └── README.md
+│   ├── README.md
+│   ├── check-filenames.mjs
+│   └── dev.sh
 ├── index.js             # 初始化前已有文件，未读取或修改
 ├── package.json         # pnpm workspace 根，packageManager 为 pnpm
 ├── pnpm-workspace.yaml
@@ -91,6 +94,7 @@ class/
 ## 维护要求
 
 - 文档只描述真实存在的结构；计划项明确标注为计划。
+- 手写源码的文件名和目录名使用 kebab-case，不含大写字母。权威说明见 `docs/code-conventions.md`。
 - 根目录只放项目级入口和全局配置，模块专属配置归入对应模块。
 - 不创建与现有目录职责重叠的新根目录。
 - 选型变更时同步对应模块 README。只记录影响边界的决策，不为安装依赖单独写说明。

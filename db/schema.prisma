@@ -1,8 +1,9 @@
 // Period 1 trial slice. Later modules: ScheduleRule, Enrollment, CreditAccount,
-// CreditEntry, Parent / StudentGuardian. Do not treat those as existing tables.
+// CreditEntry. Do not treat those as existing tables.
 generator client {
-  provider = "prisma-client-js"
-  output   = "../backend/generated/prisma"
+  provider     = "prisma-client"
+  output       = "../backend/src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -51,21 +52,74 @@ enum FollowUpOutcome {
   not_interested
 }
 
+enum CourseProgram {
+  primary
+  junior
+  vce
+  exam_prep
+  ucat
+}
+
+enum CourseSubject {
+  english
+  eal
+  english_language
+  writing
+  maths
+  general_maths
+  maths_methods
+  specialist_maths
+  science
+  chemistry
+  biology
+  physics
+  psychology
+  latin
+  selective_entry
+  scholarship
+  ucat
+}
+
+enum GuardianRelationship {
+  parent
+  guardian
+}
+
+enum TrialSubmittedBy {
+  student
+  guardian
+}
+
+enum ReferralSource {
+  instagram
+  facebook
+  other_social
+  friend_referral
+  open_day
+  web_search
+  other
+}
+
 /// Staff login identity. Admin and teacher share one table.
 model User {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String   @unique
-  displayName  String   @map("display_name")
-  role         UserRole
-  /// Local/demo hash until Better Auth owns credentials.
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String    @unique
+  displayName   String    @map("display_name")
+  role          UserRole
+  /// Legacy pgcrypto hash from the SQL seed. Better Auth stores credentials in Account.
+  passwordHash  String?   @map("password_hash")
+  emailVerified Boolean   @default(true) @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   ownedStudents     Student[]            @relation("StudentOwner")
   defaultClasses    Class[]              @relation("ClassDefaultTeacher")
   plannedSessions   ClassSession[]       @relation("SessionPlannedTeacher")
   assignedSessions  ClassSession[]       @relation("SessionAssignedTeacher")
   authoredFollowUps FollowUp[]           @relation("FollowUpAuthor")
+  sessions          Session[]
+  accounts          Account[]
 
   @@map("users")
 }
@@ -74,15 +128,18 @@ model User {
 model Student {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   displayName   String   @map("display_name")
-  yearLevel     String?  @map("year_level")
-  guardianName  String?  @map("guardian_name")
-  /// Full number for the expanded student card. UI must mask until opened.
+  /// Victorian year level, displayed as "Year 1" … "Year 12".
+  yearLevel     String   @map("year_level")
+  currentSchool String?  @map("current_school")
+  email         String?
+  /// Student-submitted contact. UI must mask until the card is expanded.
   phone         String?
   notes         String?
   ownerAdminId  String   @map("owner_admin_id") @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   ownerAdmin   User                  @relation("StudentOwner", fields: [ownerAdminId], references: [id], onDelete: Restrict)
+  guardians    StudentGuardian[]
   trialCase    TrialCase?
   participants SessionParticipant[]
 
@@ -90,11 +147,70 @@ model Student {
   @@map("students")
 }
 
-model Course {
+/// Public trial-form campus list: Box Hill, Mt Waverley, Melbourne city, Ormond, Point Cook, Adelaide, Online.
+model Campus {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @unique
+  code      String   @unique
+  name      String
+  nameZh    String   @map("name_zh")
+  suburb    String?
+  address   String?
+  yearFrom  Int      @map("year_from")
+  yearTo    Int      @map("year_to")
+  isOnline  Boolean  @default(false) @map("is_online")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  classes   Class[]
+
+  classes    Class[]
+  trialCases TrialCase[]
+
+  @@map("campuses")
+}
+
+/// Parent or guardian contact from the public trial form (section B).
+model Guardian {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName    String   @map("display_name")
+  email          String
+  /// Full number. UI must mask until the student card is expanded.
+  phone          String
+  marketingOptIn Boolean  @default(false) @map("marketing_opt_in")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  students StudentGuardian[]
+
+  @@index([email])
+  @@map("guardians")
+}
+
+model StudentGuardian {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String               @map("student_id") @db.Uuid
+  guardianId   String               @map("guardian_id") @db.Uuid
+  relationship GuardianRelationship @default(parent)
+  isPrimary    Boolean              @default(true) @map("is_primary")
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  guardian Guardian @relation(fields: [guardianId], references: [id], onDelete: Restrict)
+
+  @@unique([studentId, guardianId])
+  @@index([guardianId])
+  @@map("student_guardians")
+}
+
+/// Catalogue course from Austin's published programs, not a dated class.
+model Course {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String        @unique
+  nameEn    String        @map("name_en")
+  subject   CourseSubject
+  program   CourseProgram
+  yearFrom  Int           @map("year_from")
+  yearTo    Int           @map("year_to")
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  classes    Class[]
+  trialCases TrialCase[]
 
   @@map("courses")
 }
@@ -102,15 +218,18 @@ model Course {
 model Class {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   courseId         String   @map("course_id") @db.Uuid
+  campusId         String   @map("campus_id") @db.Uuid
   defaultTeacherId String   @map("default_teacher_id") @db.Uuid
   name             String   @unique
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   course         Course         @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  campus         Campus         @relation(fields: [campusId], references: [id], onDelete: Restrict)
   defaultTeacher User           @relation("ClassDefaultTeacher", fields: [defaultTeacherId], references: [id], onDelete: Restrict)
   sessions       ClassSession[]
 
   @@index([courseId])
+  @@index([campusId])
   @@index([defaultTeacherId])
   @@map("classes")
 }
@@ -139,21 +258,30 @@ model ClassSession {
 
 /// One trial workflow per student. Created at signup, before any session.
 model TrialCase {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId      String          @unique @map("student_id") @db.Uuid
-  status         TrialCaseStatus
-  nextFollowupAt DateTime?       @map("next_followup_at") @db.Timestamptz(6)
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId         String           @unique @map("student_id") @db.Uuid
+  status            TrialCaseStatus
+  preferredCampusId String?          @map("preferred_campus_id") @db.Uuid
+  requestedCourseId String?          @map("requested_course_id") @db.Uuid
+  submittedBy       TrialSubmittedBy @default(guardian) @map("submitted_by")
+  referralSource    ReferralSource?  @map("referral_source")
+  concerns          String?
+  nextFollowupAt    DateTime?        @map("next_followup_at") @db.Timestamptz(6)
   /// Admin communication draft. Saving it must not advance status.
-  followupDraft  String?         @map("followup_draft")
-  closedReason   String?         @map("closed_reason")
-  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  followupDraft     String?          @map("followup_draft")
+  closedReason      String?          @map("closed_reason")
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  student      Student               @relation(fields: [studentId], references: [id], onDelete: Restrict)
-  participants SessionParticipant[]
-  followUps    FollowUp[]
+  student          Student               @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  preferredCampus  Campus?               @relation(fields: [preferredCampusId], references: [id], onDelete: Restrict)
+  requestedCourse  Course?               @relation(fields: [requestedCourseId], references: [id], onDelete: Restrict)
+  participants     SessionParticipant[]
+  followUps        FollowUp[]
 
   @@index([status])
+  @@index([preferredCampusId])
+  @@index([requestedCourseId])
   @@map("trial_cases")
 }
 
@@ -196,4 +324,53 @@ model FollowUp {
 
   @@index([trialCaseId, createdAt(sort: Desc)])
   @@map("follow_ups")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  token     String   @unique
+  createdAt DateTime @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @map("updated_at") @db.Timestamptz(6)
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  userId    String   @map("user_id") @db.Uuid
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id") @db.Uuid
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at") @db.Timestamptz(6)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.Timestamptz(6)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime  @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  createdAt  DateTime? @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime? @map("updated_at") @db.Timestamptz(6)
+
+  @@map("verification")
 }

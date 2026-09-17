@@ -10,7 +10,7 @@
 - React Router DOM 7
 - TanStack Query 5
 - Ant Design 6.6.4
-- axios（`src/api/httpbase.ts` 为唯一 HTTP 入口）
+- axios（`src/api/http-base.ts` 为唯一 HTTP 入口）
 - CASL（`@casl/ability`、`@casl/react`）
 - lodash-es（与现有 ESLint 规则一致，禁止原生 `list.map` 等）
 
@@ -25,11 +25,11 @@
 ## 约定结构
 
 - `src/`：实现代码。
-- `src/api/httpbase.ts`：axios 实例，浏览器请求的唯一入口；业务模块只通过它访问 `/api`。
+- `src/api/http-base.ts`：axios 实例，浏览器请求的唯一入口；业务模块只通过它访问 `/api`。
 - `tests/`：无法就近放置的集成或端到端测试。
 - `design/`：本模块的架构、交互和编码约定。
 
-组件按使用范围放置：仅本页使用的放在对应页面目录的 `components/` 下；跨页面公用的才放入全局 `src/components/`。不要为“以后可能复用”提前提升到全局。细节见 `design/rule.md`。
+组件按使用范围放置：仅本页使用的放在对应页面目录的 `components/` 下；跨页面公用的才放入全局 `src/components/`。不要为“以后可能复用”提前提升到全局。文件名必须 kebab-case，见 `docs/code-conventions.md`。细节见 `design/rule.md`。
 
 ## 验证命令
 

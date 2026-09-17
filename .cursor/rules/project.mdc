@@ -9,4 +9,6 @@ alwaysApply: true
 
 包管理只用 pnpm。不以 npm 或 yarn 安装依赖，不生成 `package-lock.json` 或 `yarn.lock`。
 
+手写源码的文件名和目录名只用 kebab-case，禁止大写。规范见 `docs/code-conventions.md`。
+
 

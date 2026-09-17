@@ -1,0 +1,27 @@
+.page {
+  min-height: 100vh;
+  background: var(--app-color-layout);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(25, 26, 34, 0.08);
+  background: var(--app-color-surface);
+}
+
+.content {
+  width: min(960px, calc(100% - 48px));
+  min-height: 320px;
+  margin: 32px auto;
+  padding: 32px;
+  border-radius: var(--app-radius-card);
+  background: var(--app-color-surface);
+  box-shadow: var(--app-shadow-card);
+}
+
+.title {
+  margin: 0 !important;
+}

@@ -2,9 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App as AntdApp, ConfigProvider } from 'antd';
 import type { ThemeConfig } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { HomePage } from './pages/home/HomePage';
-import { LoginRoute } from './pages/login/LoginRoute';
-import { AuthGuard } from './routes/AuthGuard';
+import { HomePage } from './pages/home/home-page';
+import { LoginRoute } from './pages/login/login-route';
+import { AuthGuard } from './routes/auth-guard';
 
 const queryClient = new QueryClient();
 

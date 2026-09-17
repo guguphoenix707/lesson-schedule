@@ -34,6 +34,12 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。
 在仓库根目录：
 
 ```bash
+./scripts/dev.sh
+```
+
+或拆开：
+
+```bash
 pnpm install
 cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串和 BETTER_AUTH_SECRET，不要提交
 pnpm --filter @class/backend start:dev
@@ -58,6 +64,6 @@ pnpm --filter @class/backend prisma:deploy
 pnpm --filter @class/backend seed:auth
 ```
 
-`prisma:deploy` 应用 `db/migrations/`。业务种子是 `db/seed/001_trial_journey.sql`；登录哈希还要再跑 `seed:auth`。
+`prisma:deploy` 应用 `db/migrations/`。业务种子是 `db/seed/001-trial-journey.sql`；登录哈希还要再跑 `seed:auth`。
 
-修改实现前先阅读 `design/rule.md`。
+修改实现前先阅读 `design/rule.md`。文件名必须 kebab-case，见 `docs/code-conventions.md`。

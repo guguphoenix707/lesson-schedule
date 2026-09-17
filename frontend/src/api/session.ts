@@ -1,4 +1,4 @@
-import { getHttpErrorMessage, httpBase, isHttpUnauthorized } from './httpbase';
+import { getHttpErrorMessage, httpBase, isHttpUnauthorized } from './http-base';
 
 export type StaffSession = {
   id: string;
