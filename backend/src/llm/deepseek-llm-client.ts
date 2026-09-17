@@ -35,7 +35,7 @@ export class DeepseekLlmClient implements LlmClient {
           messages: input.messages,
           max_tokens: input.maxOutputTokens,
           stream: false,
-          temperature: 0.6,
+          temperature: 0.8,
           thinking: { type: 'disabled' },
         }),
         signal: AbortSignal.timeout(requestTimeoutMs),
