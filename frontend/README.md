@@ -46,7 +46,7 @@ pnpm --filter @class/frontend dev
 pnpm --filter @class/frontend build
 ```
 
-开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，安排试听和改期共用 `/scheduleTrial/:trialID`，试听跟踪 `/trial-followup/:trialID`，教师进入 `/teacher/trial-task/list`，处理页 `/teacher/trial-task/:participantId`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `GET /api/trial-tasklist`、`POST /api/trial-cases/:trialCaseId/schedule`、`GET /api/trial-cases/:trialCaseId`、`POST /api/trial-cases/:trialCaseId/followup-draft`、`POST /api/trial-cases/:trialCaseId/follow-ups`、`GET /api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
+开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，安排试听和改期共用 `/scheduleTrial/:trialID`，试听跟踪 `/trial-followup/:trialID`，教师进入 `/teacher/trial-task/list`，处理页 `/teacher/trial-task/:participantId`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `GET /api/trial-tasklist`、`POST /api/trial-cases/:trialCaseId/schedule`、`GET /api/trial-cases/:trialCaseId`、`POST /api/trial-cases/:trialCaseId/followup-draft/generate`、`POST /api/trial-cases/:trialCaseId/followup-draft`、`POST /api/trial-cases/:trialCaseId/follow-ups`、`GET /api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
 
 演示账号与密码见 `db/README.md`。
 

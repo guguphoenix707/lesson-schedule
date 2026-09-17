@@ -5,6 +5,7 @@
 ```text
 class/
 ├── AGENTS.md
+├── DESIGN.md
 ├── README.md
 ├── .agents/
 │   └── skills/antd/SKILL.md

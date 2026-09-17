@@ -7,6 +7,7 @@
 - 项目协作与 AI 约束：[`AGENTS.md`](AGENTS.md)
 - 项目结构：[`docs/project-structure.md`](docs/project-structure.md)
 - 通用代码规范：[`docs/code-conventions.md`](docs/code-conventions.md)
+- 作业设计文档：[`DESIGN.md`](DESIGN.md)
 - 作业资料：[`docs/技术作业.html`](docs/技术作业.html)
 - 试听数据关系：[`docs/trial-slice-data-relations-v2.md`](docs/trial-slice-data-relations-v2.md)
 - 试听产品功能清单：[`docs/trial-product-features-v1.md`](docs/trial-product-features-v1.md)
