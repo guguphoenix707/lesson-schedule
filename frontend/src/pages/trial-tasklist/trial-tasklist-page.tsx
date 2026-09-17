@@ -197,7 +197,6 @@ function createColumns(
             {map(record.allowedActions, (action: TrialAdminAction) => (
               <Button
                 key={action}
-                danger={action === 'cancel'}
                 href={
                   action === 'follow_up'
                     ? `/trial-followup/${record.id}`

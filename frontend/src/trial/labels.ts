@@ -28,7 +28,6 @@ export const derivedSessionLabels: Record<DerivedSessionLabel, string> = {
 export const trialAdminActionLabels: Record<TrialAdminAction, string> = {
   schedule: '安排试听',
   reschedule: '改期',
-  cancel: '取消',
   follow_up: '处理',
 };
 

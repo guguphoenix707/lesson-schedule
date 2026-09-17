@@ -11,7 +11,6 @@ export type TrialCaseStatus =
 export type TrialAdminAction =
   | 'schedule'
   | 'reschedule'
-  | 'cancel'
   | 'follow_up';
 
 export type DerivedSessionLabel =

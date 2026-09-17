@@ -3,7 +3,6 @@ import type { TrialCaseStatus } from '../generated/prisma/client';
 export type TrialAdminAction =
   | 'schedule'
   | 'reschedule'
-  | 'cancel'
   | 'follow_up';
 
 export type DerivedSessionLabel =
@@ -15,7 +14,7 @@ export function allowedAdminActions(status: TrialCaseStatus): TrialAdminAction[]
     case 'pending_schedule':
       return ['schedule'];
     case 'scheduled':
-      return ['reschedule', 'cancel'];
+      return ['reschedule'];
     case 'pending_followup':
     case 'following_up':
       return ['follow_up'];
