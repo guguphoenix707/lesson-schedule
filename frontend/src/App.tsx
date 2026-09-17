@@ -40,7 +40,10 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <ConfigProvider theme={theme}>
         <AntdApp>
-          <HistoryRouter history={history as never}>
+          <HistoryRouter
+            basename={import.meta.env.BASE_URL}
+            history={history as never}
+          >
             <Routes>
               <Route path="/login" element={<LoginRoute />} />
               <Route element={<AuthGuard />}>
