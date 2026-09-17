@@ -27,8 +27,9 @@
 |---|---|---|
 | `/auth/*` | `src/api/auth.ts` | 登录、退出、读会话。未登录时 `get-session` 为 `null`。 |
 | `/common/*` | 对应公开接口客户端 | 不依赖登录。 |
-| `/students` | `src/api/students.ts` | 管理员名下试听学生任务列表。教师 403。 |
+| `/trial-tasklist` | `src/api/trial-tasklist.ts` | 当前管理员名下学生关联的试听流程列表。教师 403。 |
 | `/students/:studentId` | `src/api/students.ts` | 学生卡片与试听课程。管理员只能读自己负责的学生。 |
+| `/session-participants` | `src/api/session-participants.ts` | 当前教师待处理试听名单。管理员 403。 |
 
 ## Ant Design
 

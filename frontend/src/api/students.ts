@@ -24,18 +24,6 @@ export type DerivedSessionLabel =
   | 'waiting_for_class'
   | 'awaiting_teacher_result';
 
-export type StudentListItem = {
-  id: string;
-  displayName: string;
-  trialCase: {
-    id: string;
-    status: TrialCaseStatus;
-    derivedSessionLabel: DerivedSessionLabel | null;
-    nextFollowupAt: string | null;
-    allowedActions: TrialAdminAction[];
-  } | null;
-};
-
 export type StudentDetail = {
   id: string;
   displayName: string;
@@ -71,31 +59,8 @@ export type StudentDetail = {
   } | null;
 };
 
-export const studentsQueryKey = ['students'] as const;
-
 export function studentQueryKey(studentId: string) {
   return ['students', studentId] as const;
-}
-
-type StudentListResponse = {
-  items: StudentListItem[];
-};
-
-export async function fetchStudents(): Promise<StudentListItem[]> {
-  try {
-    const { data } = await httpBase.get<StudentListResponse>('/students');
-    return data.items;
-  } catch (error) {
-    if (isHttpUnauthorized(error)) {
-      throw new Error('请先登录', { cause: error });
-    }
-    if (isHttpForbidden(error)) {
-      throw new Error('没有权限查看学生任务', { cause: error });
-    }
-    throw new Error(getHttpErrorMessage(error, '无法加载学生任务'), {
-      cause: error,
-    });
-  }
 }
 
 export async function fetchStudent(studentId: string): Promise<StudentDetail> {

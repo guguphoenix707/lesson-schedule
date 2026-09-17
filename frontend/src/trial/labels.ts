@@ -1,4 +1,14 @@
+import { map } from 'lodash-es';
 import type { DerivedSessionLabel, TrialAdminAction, TrialCaseStatus } from '../api/students';
+
+export const trialCaseStatuses: TrialCaseStatus[] = [
+  'pending_schedule',
+  'scheduled',
+  'pending_followup',
+  'following_up',
+  'interested',
+  'closed',
+];
 
 export const trialCaseStatusLabels: Record<TrialCaseStatus, string> = {
   pending_schedule: '待安排试听',
@@ -29,3 +39,8 @@ export const trialCaseStatusColors: Record<TrialCaseStatus, string> = {
   interested: 'green',
   closed: 'default',
 };
+
+export const trialCaseStatusOptions = map(trialCaseStatuses, (status) => ({
+  value: status,
+  label: trialCaseStatusLabels[status],
+}));

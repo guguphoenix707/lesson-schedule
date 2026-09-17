@@ -13,6 +13,13 @@ export function createAbilityFor(user: AuthenticatedUser): AppAbility {
 
   if (user.role === 'admin') {
     can('read', 'Student', { ownerAdminId: user.id });
+    can('read', 'TrialCase', { student: { ownerAdminId: user.id } });
+  }
+
+  if (user.role === 'teacher') {
+    can('read', 'SessionParticipant', {
+      session: { assignedTeacherId: user.id },
+    });
   }
 
   return build();

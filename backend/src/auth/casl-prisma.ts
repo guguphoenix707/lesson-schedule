@@ -6,7 +6,12 @@ import {
   type PrismaQueryOf,
   type Subjects,
 } from '@casl/prisma/runtime';
-import type { Prisma, Student } from '../generated/prisma/client';
+import type {
+  Prisma,
+  SessionParticipant,
+  Student,
+  TrialCase,
+} from '../generated/prisma/client';
 
 export { accessibleBy, createPrismaAbility };
 
@@ -15,6 +20,8 @@ export type PrismaQuery<T extends Model<object, string> = Model<object, string>>
 
 export type AppSubjects = Subjects<{
   Student: Student;
+  TrialCase: TrialCase;
+  SessionParticipant: SessionParticipant;
 }>;
 
 export type AppAbility = Ability<['read', AppSubjects], PrismaQuery>;

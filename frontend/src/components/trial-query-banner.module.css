@@ -1,0 +1,25 @@
+.root {
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: rgba(25, 26, 34, 0.04);
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 280px;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.statusSelect,
+.nameInput {
+  min-width: 0;
+  flex: 1 1 auto;
+}

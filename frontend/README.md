@@ -25,6 +25,7 @@
 ## 约定结构
 
 - `src/`：实现代码。
+- `src/trial/`：试听列表共用的状态文案和查询匹配；查询条 UI 为 `src/components/trial-query-banner.tsx`，状态选项由页面注入。
 - `src/api/http-base.ts`：axios 实例，浏览器请求的唯一入口；业务模块只通过它访问 `/api`。
 - `src/api/auth.ts`：Better Auth 登录、退出和当前会话。不是业务资源。
 - `src/auth/ability.ts`：根据会话角色生成 CASL，只用于界面展示或禁用。
@@ -44,7 +45,7 @@ pnpm --filter @class/frontend dev
 pnpm --filter @class/frontend build
 ```
 
-开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，教师进入 `/`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `/api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
+开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，教师进入 `/teacher/trial-task/list`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `GET /api/trial-tasklist`、`GET /api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
 
 演示账号与密码见 `db/README.md`。
 

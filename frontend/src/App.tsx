@@ -4,9 +4,11 @@ import type { ThemeConfig } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { HomePage } from './pages/home/home-page';
 import { LoginRoute } from './pages/login/login-route';
+import { TeacherTrialTaskListPage } from './pages/teacher/trial-task/list';
 import { TrialTasklistPage } from './pages/trial-tasklist/trial-tasklist-page';
 import { AdminGuard } from './routes/admin-guard';
 import { AuthGuard } from './routes/auth-guard';
+import { TeacherGuard } from './routes/teacher-guard';
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,12 @@ export function App() {
                   <Route
                     path="/trial-tasklist"
                     element={<TrialTasklistPage />}
+                  />
+                </Route>
+                <Route element={<TeacherGuard />}>
+                  <Route
+                    path="/teacher/trial-task/list"
+                    element={<TeacherTrialTaskListPage />}
                   />
                 </Route>
               </Route>
