@@ -23,6 +23,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Class API')

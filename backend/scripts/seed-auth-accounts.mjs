@@ -1,6 +1,6 @@
 import { hashPassword } from 'better-auth/crypto';
-import { DEMO_PASSWORD, DEMO_STAFF } from '../src/auth/demo-staff.ts';
-import { prisma } from '../src/prisma-client.ts';
+import { DEMO_PASSWORD, DEMO_STAFF } from '../dist/src/auth/demo-staff.js';
+import { prisma } from '../dist/src/prisma-client.js';
 
 async function seedAuthAccounts() {
   const now = new Date();
@@ -33,10 +33,12 @@ async function seedAuthAccounts() {
 
 seedAuthAccounts()
   .then(async () => {
-    console.log(`Seeded Better Auth credentials for ${DEMO_STAFF.length} demo staff accounts.`);
+    console.log(
+      `Seeded Better Auth credentials for ${DEMO_STAFF.length} demo staff accounts.`,
+    );
     await prisma.$disconnect();
   })
-  .catch(async (error: unknown) => {
+  .catch(async (error) => {
     console.error(error);
     await prisma.$disconnect();
     process.exitCode = 1;

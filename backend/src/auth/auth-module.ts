@@ -1,9 +1,9 @@
 import { Module, type OnModuleInit } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
+import { APP_GUARD, HttpAdapterHost } from '@nestjs/core';
 import { fromNodeHeaders } from 'better-auth/node';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { auth } from './auth';
-import { MeController } from './me-controller';
+import { SessionGuard } from './session-guard';
 
 function firstHeader(
   value: string | string[] | undefined,
@@ -70,7 +70,12 @@ async function handleAuthRequest(
 }
 
 @Module({
-  controllers: [MeController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: SessionGuard,
+    },
+  ],
 })
 export class AuthModule implements OnModuleInit {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}

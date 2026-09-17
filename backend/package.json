@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed:auth": "node --experimental-strip-types --experimental-default-type=module scripts/seed-auth-accounts.ts"
+    "seed:auth": "node scripts/seed-auth-accounts.mjs"
   },
   "prisma": {
     "schema": "../db/schema.prisma"

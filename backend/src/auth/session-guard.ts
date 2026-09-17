@@ -1,12 +1,15 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { fromNodeHeaders } from 'better-auth/node';
 import type { FastifyRequest } from 'fastify';
 import { auth } from './auth';
+import { IS_PUBLIC_KEY, isPublicApiPath } from './is-public';
 
 export type AuthenticatedUser = {
   id: string;
@@ -25,8 +28,19 @@ function isStaffRole(value: unknown): value is 'admin' | 'teacher' {
 
 @Injectable()
 export class SessionGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic || isPublicApiPath(request.url)) {
+      return true;
+    }
+
     const session = await auth.api.getSession({
       headers: fromNodeHeaders(request.headers),
     });
@@ -37,7 +51,7 @@ export class SessionGuard implements CanActivate {
 
     const { user } = session;
     if (!isStaffRole(user.role)) {
-      throw new UnauthorizedException();
+      throw new ForbiddenException();
     }
 
     request.user = {

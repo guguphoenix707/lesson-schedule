@@ -42,7 +42,7 @@ pnpm --filter @class/frontend dev
 pnpm --filter @class/frontend build
 ```
 
-开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；已登录后进入 `/`。
+开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；已登录后进入 `/`。当前登录身份读 Better Auth 的 `GET /api/auth/get-session`，不调用业务 `/me`。
 
 演示账号与密码见 `db/README.md`。
 

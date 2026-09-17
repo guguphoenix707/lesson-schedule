@@ -48,11 +48,13 @@ pnpm --filter @class/backend build
 
 开发环境 Swagger UI：`http://localhost:3000/api/docs`。
 
-当前登录接口：
+当前登录接口（Better Auth，不走业务角色鉴权）：
 
-- `POST /api/auth/sign-in/email`：邮箱密码登录（Better Auth，HttpOnly Cookie）
+- `POST /api/auth/sign-in/email`：邮箱密码登录（HttpOnly Cookie）
 - `POST /api/auth/sign-out`：退出
-- `GET /api/me`：当前员工会话；未登录返回 401
+- `GET /api/auth/get-session`：当前会话；未登录返回 `null`
+
+业务接口默认先校验会话，再按角色鉴权（本期仅 `admin` / `teacher`）。公开接口只放在 `/api/common`。不提供 `GET /api/me`。
 
 不开放注册。演示账号与密码以 `db/README.md` 为准。
 
