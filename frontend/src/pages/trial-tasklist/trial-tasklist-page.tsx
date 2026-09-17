@@ -110,7 +110,6 @@ export function TrialTasklistPage() {
               onChange: setPage,
             }}
             rowKey="id"
-            scroll={{ x: 920 }}
           />
         )}
       </main>

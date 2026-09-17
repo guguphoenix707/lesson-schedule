@@ -158,7 +158,7 @@ export function ScheduleTrialPanel({ trialCaseId }: ScheduleTrialPanelProps) {
             );
           },
         }}
-        scroll={{ x: 640, y: 320 }}
+        scroll={{ y: 320 }}
         size="small"
         onRow={(record) => ({
           onClick: () => {

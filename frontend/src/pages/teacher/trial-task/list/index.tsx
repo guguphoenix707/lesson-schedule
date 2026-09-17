@@ -92,7 +92,6 @@ export function TeacherTrialTaskListPage() {
               onChange: setPage,
             }}
             rowKey="id"
-            scroll={{ x: 640 }}
           />
         )}
       </main>

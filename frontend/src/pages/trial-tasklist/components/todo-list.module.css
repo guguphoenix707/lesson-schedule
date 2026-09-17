@@ -1,0 +1,74 @@
+.root {
+  margin-bottom: 16px;
+}
+
+.card {
+  flex: 1 1 140px;
+  min-width: 140px;
+}
+
+.cardBody {
+  padding: 8px 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.statHeader {
+  padding-bottom: 0;
+}
+
+.statTitle {
+  font-size: 13px;
+}
+
+.statValue {
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.pendingSchedule {
+  background: var(--ant-orange-1, #fff7e6);
+  border-color: var(--ant-orange-3, #ffd591);
+}
+
+.card.pendingSchedule .statTitle,
+.card.pendingSchedule .statValue {
+  color: var(--ant-orange-7, #d46b08);
+}
+
+.pendingFollowup {
+  background: var(--ant-gold-1, #fffbe6);
+  border-color: var(--ant-gold-3, #ffe58f);
+}
+
+.card.pendingFollowup .statTitle,
+.card.pendingFollowup .statValue {
+  color: var(--ant-gold-7, #d48806);
+}
+
+.scheduled {
+  background: var(--ant-blue-1, #e6f4ff);
+  border-color: var(--ant-blue-3, #91caff);
+}
+
+.card.scheduled .statTitle,
+.card.scheduled .statValue {
+  color: var(--ant-blue-7, #0958d9);
+}
+
+.interested {
+  background: var(--ant-green-1, #f6ffed);
+  border-color: var(--ant-green-3, #b7eb8f);
+}
+
+.card.interested .statTitle,
+.card.interested .statValue {
+  color: var(--ant-green-7, #389e0d);
+}
