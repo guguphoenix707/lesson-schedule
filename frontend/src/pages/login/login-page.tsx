@@ -2,7 +2,7 @@ import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App, Button, Checkbox, Form, Input, Typography } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { sessionQueryKey, signInWithEmail } from '../../api/session';
+import { sessionQueryKey, signInWithEmail } from '../../api/auth';
 import { Brand } from '../../components/brand';
 import styles from './login-page.module.css';
 

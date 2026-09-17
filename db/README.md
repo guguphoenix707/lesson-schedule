@@ -11,7 +11,7 @@
 
 ## 本期范围
 
-依据 [试听切片数据关系 v2](https://my.feishu.cn/wiki/Qoepw4h6IisXyVkb8VVcXGcynZd) 和 [Journey-试听](https://my.feishu.cn/wiki/GAPNwCpt8i2xzCk6VaqcY7TmnIe)。
+依据 [试听切片数据关系 v2](../docs/trial-slice-data-relations-v2.md) 和 [试听管理产品功能清单（V1）](../docs/trial-product-features-v1.md)。流程语境另见 [Journey-试听](https://my.feishu.cn/wiki/GAPNwCpt8i2xzCk6VaqcY7TmnIe)。完整地址表见 [`docs/README.md`](../docs/README.md#设计来源)。
 
 已建表：`users`、`students`、`campuses`、`guardians`、`student_guardians`、`courses`、`classes`、`class_sessions`、`trial_cases`、`session_participants`、`follow_ups`，以及 Better Auth 使用的 `session`、`account`、`verification`。
 

@@ -12,7 +12,7 @@
 - CASL（`@casl/ability`、`@casl/prisma`）
 - Prisma 7 + `@prisma/adapter-pg` + `pg`，数据库为 PostgreSQL
 
-Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。
+Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。试听业务范围见 [试听管理产品功能清单（V1）](../docs/trial-product-features-v1.md)，数据关系见 [试听切片数据关系 v2](../docs/trial-slice-data-relations-v2.md)。地址表见 [`docs/README.md`](../docs/README.md#设计来源)。
 
 ## 边界
 

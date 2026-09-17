@@ -44,7 +44,10 @@ class/
 │   ├── README.md
 │   ├── code-conventions.md
 │   ├── project-structure.md
-│   └── 技术作业.html
+│   ├── 技术作业.html
+│   ├── trial-slice-data-relations-v2.md
+│   ├── trial-product-features-v1.md
+│   └── assets/trial-slice-data-relations-v2/
 ├── eval/
 │   ├── README.md
 │   ├── cases/

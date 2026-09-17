@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App, Button, Space, Typography } from 'antd';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { sessionQueryKey, signOut } from '../../api/session';
-import type { StaffSession } from '../../api/session';
+import { sessionQueryKey, signOut } from '../../api/auth';
+import type { StaffSession } from '../../api/auth';
 import { Brand } from '../../components/brand';
 import styles from './home-page.module.css';
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Spin } from 'antd';
 import { Navigate } from 'react-router-dom';
-import { fetchCurrentSession, sessionQueryKey } from '../../api/session';
+import { fetchCurrentSession, sessionQueryKey } from '../../api/auth';
 import { RouteStatus } from '../../routes/route-status';
 import { LoginPage } from './login-page';
 
