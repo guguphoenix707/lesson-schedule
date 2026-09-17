@@ -59,7 +59,7 @@ pnpm --filter @class/backend build
 当前试听待办接口：
 
 - `GET /api/trial-tasklist`：当前管理员名下学生关联的试听流程列表。查询 `TrialCase`，并按 `student.owner_admin_id` 限定为当前管理员；教师 403。
-- `GET /api/trial-cases/:trialCaseId/schedulable-sessions`：该试听可安排的未来课次（未取消、未开始，且该学生尚未有该课次记录）。教师 403。
+- `GET /api/trial-cases/:trialCaseId/schedulable-sessions`：该试听可安排的未来课次（未取消、未开始，且该学生尚未有该课次记录），以及关联学生的 `id` / `displayName`。教师 403。
 - `POST /api/trial-cases/:trialCaseId/schedule`：为 `pending_schedule` 的试听安排已有课次。事务内锁定 TrialCase，写入 trial `SessionParticipant` 并将状态改为 `scheduled`。教师 403。
 - `GET /api/students/:studentId`：学生与试听课程详情。管理员只能读 `owner_admin_id` 为自己的学生；教师 403。
 

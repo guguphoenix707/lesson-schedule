@@ -32,4 +32,39 @@ export class TrialCasesController {
   ) {
     return this.trialCasesService.schedule(user, trialCaseId, body);
   }
+
+  @Get(':trialCaseId')
+  @ApiOperation({
+    summary: 'Get follow-up context for an owned trial case',
+  })
+  getOne(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('trialCaseId', ParseUUIDPipe) trialCaseId: string,
+  ) {
+    return this.trialCasesService.getFollowup(user, trialCaseId);
+  }
+
+  @Post(':trialCaseId/followup-draft')
+  @ApiOperation({
+    summary: 'Save the admin communication draft without changing trial status',
+  })
+  saveFollowupDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('trialCaseId', ParseUUIDPipe) trialCaseId: string,
+    @Body() body: unknown,
+  ) {
+    return this.trialCasesService.saveFollowupDraft(user, trialCaseId, body);
+  }
+
+  @Post(':trialCaseId/follow-ups')
+  @ApiOperation({
+    summary: 'Record a follow-up result on a pending or in-progress trial case',
+  })
+  createFollowUp(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('trialCaseId', ParseUUIDPipe) trialCaseId: string,
+    @Body() body: unknown,
+  ) {
+    return this.trialCasesService.createFollowUp(user, trialCaseId, body);
+  }
 }

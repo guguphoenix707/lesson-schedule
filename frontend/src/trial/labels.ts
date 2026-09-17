@@ -1,4 +1,5 @@
 import { map } from 'lodash-es';
+import type { FollowUpOutcome } from '../api/trial-cases';
 import type { DerivedSessionLabel, TrialAdminAction, TrialCaseStatus } from '../api/students';
 
 export const trialCaseStatuses: TrialCaseStatus[] = [
@@ -43,4 +44,23 @@ export const trialCaseStatusColors: Record<TrialCaseStatus, string> = {
 export const trialCaseStatusOptions = map(trialCaseStatuses, (status) => ({
   value: status,
   label: trialCaseStatusLabels[status],
+}));
+
+export const followUpOutcomes: FollowUpOutcome[] = [
+  'unreachable',
+  'considering',
+  'interested',
+  'not_interested',
+];
+
+export const followUpOutcomeLabels: Record<FollowUpOutcome, string> = {
+  unreachable: '未联系上',
+  considering: '家长需要考虑',
+  interested: '有报名意向',
+  not_interested: '暂不考虑',
+};
+
+export const followUpOutcomeOptions = map(followUpOutcomes, (outcome) => ({
+  value: outcome,
+  label: followUpOutcomeLabels[outcome],
 }));

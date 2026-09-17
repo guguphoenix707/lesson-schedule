@@ -1,14 +1,21 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App as AntdApp, ConfigProvider } from 'antd';
 import type { ThemeConfig } from 'antd';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  Navigate,
+  Route,
+  Routes,
+  unstable_HistoryRouter as HistoryRouter,
+} from 'react-router-dom';
 import { HomePage } from './pages/home/home-page';
 import { LoginRoute } from './pages/login/login-route';
+import { ScheduleTrialPage } from './pages/schedule-trial/schedule-trial-page';
 import { TeacherTrialTaskListPage } from './pages/teacher/trial-task/list';
 import { TeacherTrialProcessPage } from './pages/teacher/trial-task/process';
 import { TrialTasklistPage } from './pages/trial-tasklist/trial-tasklist-page';
 import { AdminGuard } from './routes/admin-guard';
 import { AuthGuard } from './routes/auth-guard';
+import { history } from './routes/history';
 import { TeacherGuard } from './routes/teacher-guard';
 
 const queryClient = new QueryClient();
@@ -32,7 +39,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <ConfigProvider theme={theme}>
         <AntdApp>
-          <BrowserRouter>
+          <HistoryRouter history={history as never}>
             <Routes>
               <Route path="/login" element={<LoginRoute />} />
               <Route element={<AuthGuard />}>
@@ -41,6 +48,10 @@ export function App() {
                   <Route
                     path="/trial-tasklist"
                     element={<TrialTasklistPage />}
+                  />
+                  <Route
+                    path="/scheduleTrial/:trialID"
+                    element={<ScheduleTrialPage />}
                   />
                 </Route>
                 <Route element={<TeacherGuard />}>
@@ -56,7 +67,7 @@ export function App() {
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </BrowserRouter>
+          </HistoryRouter>
         </AntdApp>
       </ConfigProvider>
     </QueryClientProvider>

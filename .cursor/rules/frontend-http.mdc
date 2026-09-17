@@ -1,0 +1,35 @@
+---
+description: 前端 HTTP 状态码只在 httpBase 拦截器处理
+globs: frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend HTTP
+
+完整约定见 `frontend/design/rule.md` 的「HTTP 错误处理」。
+
+- 浏览器请求只走 `frontend/src/api/http-base.ts`。
+- 401 / 403 / 404 / 409 / 400 只在 `httpBase` 响应拦截器转成 `Error`。
+- 业务 API（含 `auth.ts`）和页面只发请求、取数据、展示 `error.message`。
+- 不判断 `error.response.status`，不使用或导出 `isHttpUnauthorized`。
+
+```ts
+// ❌ 业务模块按状态码分支
+export async function fetchStudent(id: string) {
+  try {
+    const { data } = await httpBase.get(`/students/${id}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      throw new Error('请先登录');
+    }
+    throw error;
+  }
+}
+
+// ✅ 拦截器已转成 Error，业务只取数据
+export async function fetchStudent(id: string) {
+  const { data } = await httpBase.get(`/students/${id}`);
+  return data;
+}
+```

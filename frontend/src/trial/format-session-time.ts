@@ -37,3 +37,7 @@ export function sessionDateKey(startsAt: string): string {
 export function formatSessionDate(startsAt: string): string {
   return melbourneDate.format(new Date(startsAt));
 }
+
+export function formatMelbourneDateTime(value: string): string {
+  return melbourneDateTime.format(new Date(value));
+}

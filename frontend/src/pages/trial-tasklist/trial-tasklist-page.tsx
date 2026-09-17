@@ -12,6 +12,7 @@ import type { TrialTasklistItem } from '../../api/trial-tasklist';
 import { AppShell } from '../../components/app-shell';
 import { StudentInfo } from '../../components/student-info';
 import { TrialQueryBanner } from '../../components/trial-query-banner';
+import { history } from '../../routes/history';
 import { formatSessionTime } from '../../trial/format-session-time';
 import {
   derivedSessionLabels,
@@ -26,7 +27,6 @@ import {
   matchesTrialQuery,
 } from '../../trial/query';
 import type { TrialQueryBannerValue } from '../../trial/query';
-import { ScheduleTrialModal } from './components/schedule-trial-modal';
 import styles from './trial-tasklist-page.module.css';
 
 const trialTablePageSize = 10;
@@ -35,20 +35,13 @@ export function TrialTasklistPage() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     null,
   );
-  const [scheduling, setScheduling] = useState<{
-    trialCaseId: string;
-    studentName: string;
-  } | null>(null);
   const [query, setQuery] = useState<TrialQueryBannerValue>(emptyTrialQuery);
   const [page, setPage] = useState(1);
   const tasklistQuery = useQuery({
     queryKey: trialTasklistQueryKey,
     queryFn: fetchTrialTasklist,
   });
-  const columns = useMemo(
-    () => createColumns(setSelectedStudentId, setScheduling),
-    [],
-  );
+  const columns = useMemo(() => createColumns(setSelectedStudentId), []);
   const filteredItems = useMemo(() => {
     const items = tasklistQuery.data ?? [];
     return filter(items, (item) =>
@@ -103,14 +96,6 @@ export function TrialTasklistPage() {
           />
         )}
       </main>
-      <ScheduleTrialModal
-        open={scheduling !== null}
-        studentName={scheduling?.studentName ?? ''}
-        trialCaseId={scheduling?.trialCaseId ?? null}
-        onClose={() => {
-          setScheduling(null);
-        }}
-      />
       <Drawer
         destroyOnHidden
         open={selectedStudentId !== null}
@@ -131,7 +116,6 @@ export function TrialTasklistPage() {
 
 function createColumns(
   onOpenStudent: (studentId: string) => void,
-  onSchedule: (item: { trialCaseId: string; studentName: string }) => void,
 ): TableProps<TrialTasklistItem>['columns'] {
   return [
     {
@@ -199,10 +183,7 @@ function createColumns(
                 type="link"
                 onClick={() => {
                   if (action === 'schedule') {
-                    onSchedule({
-                      trialCaseId: record.id,
-                      studentName: record.student.displayName,
-                    });
+                    history.push(`/scheduleTrial/${record.id}`);
                   }
                 }}
               >

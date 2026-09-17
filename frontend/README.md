@@ -13,6 +13,7 @@
 - axios（`src/api/http-base.ts` 为唯一 HTTP 入口）
 - CASL（`@casl/ability`、`@casl/react`）
 - lodash-es（与现有 ESLint 规则一致，禁止原生 `list.map` 等）
+- history（`src/routes/history.ts` 为共享实例；提交成功等需要回退时用 `history.goBack`）
 
 本期不引入 Next.js。
 
@@ -45,7 +46,7 @@ pnpm --filter @class/frontend dev
 pnpm --filter @class/frontend build
 ```
 
-开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，教师进入 `/teacher/trial-task/list`，处理页 `/teacher/trial-task/:participantId`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `GET /api/trial-tasklist`、`POST /api/trial-cases/:trialCaseId/schedule`、`GET /api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
+开发服务器默认 `http://localhost:5173`，并把 `/api` 代理到 `http://localhost:3000`，以便登录 Cookie 与页面同源。登录页 `/login`；管理员登录后进入 `/trial-tasklist`，安排试听 `/scheduleTrial/:trialID`，教师进入 `/teacher/trial-task/list`，处理页 `/teacher/trial-task/:participantId`。当前登录身份读 `GET /api/auth/get-session`。公开接口走 `/api/common`；业务资源走 REST 路径（如 `GET /api/trial-tasklist`、`POST /api/trial-cases/:trialCaseId/schedule`、`GET /api/students/:studentId`），401 表示未登录，403 表示角色不够。不调用业务 `/me`。
 
 演示账号与密码见 `db/README.md`。
 
