@@ -18,12 +18,13 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。试听�
 
 - 不包含用户界面实现或前端构建产物。
 - 数据访问通过清晰边界组织，不把存储细节泄漏到接口层。
-- 外部服务调用集中处理超时、错误、重试和可观测性。
+- 外部服务调用集中处理超时、错误、重试和可观测性。大模型调用放在 `src/llm/`，业务层只传入已脱敏的上下文。
 - 权限校验默认在可信服务端执行。
 
 ## 约定结构
 
 - `src/`：实现代码。
+- `src/llm/`：大模型适配。当前跟进草稿走 DeepSeek Pro（`deepseek-v4-pro`），密钥只从环境变量 `DEEPSEEK_API_KEY` 读取，不写入仓库。
 - `scripts/`：认证演示账号等模块内可重复脚本。
 - `tests/`：模块测试、集成测试和契约测试。
 - `design/`：本模块的架构、接口和编码约定。
@@ -41,7 +42,7 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。试听�
 
 ```bash
 pnpm install
-cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串和 BETTER_AUTH_SECRET，不要提交
+cp backend/.env.example backend/.env   # 填入本地 Postgres 连接串和 BETTER_AUTH_SECRET；AI 草稿另填 DEEPSEEK_API_KEY。不要提交
 pnpm --filter @class/backend start:dev
 pnpm --filter @class/backend build
 ```
@@ -62,6 +63,7 @@ pnpm --filter @class/backend build
 - `GET /api/trial-cases/:trialCaseId/schedulable-sessions`：该试听可安排的未来课次（未取消、未开始，且该学生尚未有该课次记录），以及关联学生的 `id` / `displayName`。教师 403。
 - `POST /api/trial-cases/:trialCaseId/schedule`：为试听选择已有课次。`pending_schedule` 时写入新预约并改为 `scheduled`；`scheduled` 且仍有有效未到课预约时先取消旧预约再写入新预约，状态保持 `scheduled`。教师 403。
 - `GET /api/trial-cases/:trialCaseId`：当前管理员名下该试听的跟踪详情（沟通草稿、教师反馈、跟进历史）。教师 403。
+- `POST /api/trial-cases/:trialCaseId/followup-draft/generate`：服务端组装脱敏试听背景（不含学生/家长姓名、电话、邮箱）和教师反馈，调用 DeepSeek Pro 生成不超过 200 字的家长沟通草稿。不落库、不推进 `TrialCase.status`。仅 `pending_followup` / `following_up`。未配置密钥时 503。教师 403。
 - `POST /api/trial-cases/:trialCaseId/followup-draft`：保存沟通草稿，不推进 `TrialCase.status`。仅 `pending_followup` / `following_up`。教师 403。
 - `POST /api/trial-cases/:trialCaseId/follow-ups`：提交跟进结果。事务内锁定 TrialCase，追加 FollowUp：未联系上/考虑中 → `following_up` 并写入未来 `next_followup_at`；有报名意向 → `interested`；暂不考虑 → `closed`。教师 403。重复提交不得把后续阶段重置。
 - `GET /api/students/:studentId`：学生与试听课程详情。管理员只能读 `owner_admin_id` 为自己的学生；教师 403。

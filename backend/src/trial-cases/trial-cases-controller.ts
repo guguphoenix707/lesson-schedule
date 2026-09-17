@@ -45,6 +45,18 @@ export class TrialCasesController {
     return this.trialCasesService.getFollowup(user, trialCaseId);
   }
 
+  @Post(':trialCaseId/followup-draft/generate')
+  @ApiOperation({
+    summary:
+      'Generate an AI communication draft without saving or changing trial status',
+  })
+  generateFollowupDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('trialCaseId', ParseUUIDPipe) trialCaseId: string,
+  ) {
+    return this.trialCasesService.generateFollowupDraft(user, trialCaseId);
+  }
+
   @Post(':trialCaseId/followup-draft')
   @ApiOperation({
     summary: 'Save the admin communication draft without changing trial status',

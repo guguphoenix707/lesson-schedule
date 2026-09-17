@@ -116,6 +116,17 @@ export async function saveTrialFollowupDraft(
   });
 }
 
+export async function generateTrialFollowupDraft(
+  trialCaseId: string,
+): Promise<string> {
+  const { data } = await httpBase.post<{ followupDraft: string }>(
+    `/trial-cases/${trialCaseId}/followup-draft/generate`,
+    {},
+    { timeout: 45_000 },
+  );
+  return data.followupDraft;
+}
+
 export async function createTrialFollowUp(
   trialCaseId: string,
   input: CreateFollowUpInput,

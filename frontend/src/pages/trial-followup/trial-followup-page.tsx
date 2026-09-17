@@ -18,6 +18,7 @@ import { map } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 import {
   fetchTrialFollowup,
+  generateTrialFollowupDraft,
   saveTrialFollowupDraft,
   trialFollowupQueryKey,
 } from '../../api/trial-cases';
@@ -54,7 +55,7 @@ export function TrialFollowupPage() {
             试听跟踪
           </Typography.Title>
           <Typography.Paragraph type="secondary">
-            查看教师反馈和历史跟进，编辑沟通草稿后提交跟进结果。保存草稿不会推进试听状态。
+            查看教师反馈和历史跟进，可生成 AI 草稿后修改保存，再提交跟进结果。生成或保存草稿都不会推进试听状态。
           </Typography.Paragraph>
         </div>
         {!trialID ? (
@@ -109,6 +110,17 @@ function TrialFollowupBody({
       message.error(error.message);
     },
   });
+  const generateMutation = useMutation({
+    mutationFn: () => generateTrialFollowupDraft(trialID),
+    onSuccess: (followupDraft) => {
+      setDraft(followupDraft);
+      message.success('已生成草稿，可修改后保存；试听状态未改变');
+    },
+    onError: (error: Error) => {
+      message.error(error.message);
+    },
+  });
+  const draftBusy = draftMutation.isPending || generateMutation.isPending;
 
   return (
     <>
@@ -134,17 +146,33 @@ function TrialFollowupBody({
             </Typography.Title>
             <Input.TextArea
               autoSize={{ minRows: 6 }}
-              disabled={!canFollowUp || draftMutation.isPending}
+              disabled={!canFollowUp || draftBusy}
               value={draft}
               onChange={(event) => {
                 setDraft(event.target.value);
               }}
             />
             {canFollowUp ? (
-              <Flex className={styles.sectionActions} justify="flex-end">
+              <Flex
+                className={styles.sectionActions}
+                gap="small"
+                justify="flex-end"
+                wrap
+              >
+                <Button
+                  htmlType="button"
+                  loading={generateMutation.isPending}
+                  disabled={draftMutation.isPending}
+                  onClick={() => {
+                    generateMutation.mutate();
+                  }}
+                >
+                  生成AI草稿
+                </Button>
                 <Button
                   htmlType="button"
                   loading={draftMutation.isPending}
+                  disabled={generateMutation.isPending}
                   onClick={() => {
                     draftMutation.mutate();
                   }}
@@ -274,7 +302,7 @@ function statusNotice(followup: TrialFollowupDetail) {
         className={styles.notice}
         showIcon
         type="warning"
-        title="当前不是跟进阶段，不能保存草稿或提交跟进结果。"
+        title="当前不是跟进阶段，不能生成或保存草稿，也不能提交跟进结果。"
       />
     );
   }

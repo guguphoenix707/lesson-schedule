@@ -24,4 +24,18 @@ export const env = {
   get port() {
     return Number(process.env.PORT ?? 3000);
   },
+  get deepseekApiKey() {
+    const value = process.env.DEEPSEEK_API_KEY?.trim();
+    return value && value.length > 0 ? value : undefined;
+  },
+  get deepseekModel() {
+    const value = process.env.DEEPSEEK_MODEL?.trim();
+    return value && value.length > 0 ? value : 'deepseek-v4-pro';
+  },
+  get deepseekBaseUrl() {
+    const value = process.env.DEEPSEEK_BASE_URL?.trim();
+    const baseUrl =
+      value && value.length > 0 ? value : 'https://api.deepseek.com';
+    return baseUrl.replace(/\/+$/, '');
+  },
 };

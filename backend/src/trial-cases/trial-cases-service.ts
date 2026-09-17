@@ -1,22 +1,46 @@
 import {
+  BadGatewayException,
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  GatewayTimeoutException,
+  HttpException,
+  Inject,
   Injectable,
+  Logger,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import type { FollowUpOutcome, TrialCaseStatus } from '../generated/prisma/client';
 import { accessibleBy, createAbilityFor } from '../auth/ability';
 import type { AuthenticatedUser } from '../auth/session-guard';
+import {
+  LLM_CLIENT,
+  LlmConfigError,
+  LlmTimeoutError,
+  LlmUpstreamError,
+  type LlmClient,
+} from '../llm/llm-client';
 import { PrismaService } from '../prisma-service';
+import {
+  FOLLOWUP_DRAFT_MAX_OUTPUT_TOKENS,
+  buildFollowupDraftMessages,
+  formatMelbourneSession,
+  normalizeFollowupDraft,
+} from './followup-draft-prompt';
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class TrialCasesService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(TrialCasesService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(LLM_CLIENT) private readonly llmClient: LlmClient,
+  ) {}
 
   async listSchedulableSessions(user: AuthenticatedUser, trialCaseId: string) {
     const ability = this.requireTrialCaseUpdate(user);
@@ -323,6 +347,88 @@ export class TrialCasesService {
     return { ok: true as const, followupDraft };
   }
 
+  async generateFollowupDraft(user: AuthenticatedUser, trialCaseId: string) {
+    const ability = this.requireTrialCaseUpdate(user);
+    const owned = await this.prisma.client.trialCase.findFirst({
+      where: {
+        AND: [
+          { id: trialCaseId },
+          accessibleBy(ability, 'update').ofType('TrialCase'),
+        ],
+      },
+      select: followupDraftLlmSelect,
+    });
+
+    if (!owned) {
+      throw new NotFoundException();
+    }
+
+    if (!isFollowupStatus(owned.status)) {
+      throw new ConflictException('当前状态不能生成沟通草稿');
+    }
+
+    const present = owned.participants[0];
+    const teacherFeedback = present
+      ? toTeacherFeedbackView(present.teacherFeedback, present.session)
+      : null;
+
+    try {
+      const { text } = await this.llmClient.generate({
+        messages: buildFollowupDraftMessages({
+          yearLevel: owned.student.yearLevel,
+          currentSchool: owned.student.currentSchool,
+          requestedCourse: owned.requestedCourse?.name ?? null,
+          preferredCampus:
+            owned.preferredCampus?.nameZh ?? owned.preferredCampus?.name ?? null,
+          concerns: owned.concerns,
+          teacherFeedback: teacherFeedback
+            ? {
+                className: teacherFeedback.session.className,
+                teacherName: teacherFeedback.session.teacherName,
+                sessionTime: formatMelbourneSession(
+                  new Date(teacherFeedback.session.startsAt),
+                  new Date(teacherFeedback.session.endsAt),
+                ),
+                performance: teacherFeedback.performance,
+                fitSuggestion: teacherFeedback.fitSuggestion,
+                questionsForAdmin: teacherFeedback.questionsForAdmin,
+              }
+            : null,
+        }),
+        maxOutputTokens: FOLLOWUP_DRAFT_MAX_OUTPUT_TOKENS,
+      });
+      const followupDraft = normalizeFollowupDraft(text);
+      if (!followupDraft) {
+        this.logger.warn('DeepSeek draft was empty after normalization');
+        throw new BadGatewayException(
+          'AI 草稿生成失败，请稍后重试或手写草稿',
+        );
+      }
+      return { followupDraft };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      if (error instanceof LlmConfigError) {
+        throw new ServiceUnavailableException(error.message);
+      }
+      if (error instanceof LlmTimeoutError) {
+        throw new GatewayTimeoutException(
+          'AI 草稿生成超时，请稍后重试或手写草稿',
+        );
+      }
+      if (error instanceof LlmUpstreamError) {
+        throw new BadGatewayException(error.message);
+      }
+      this.logger.warn(
+        `Follow-up draft generation failed: ${
+          error instanceof Error ? `${error.name}: ${error.message}` : 'unknown'
+        }`,
+      );
+      throw new BadGatewayException('AI 草稿生成失败，请稍后重试或手写草稿');
+    }
+  }
+
   async createFollowUp(
     user: AuthenticatedUser,
     trialCaseId: string,
@@ -494,6 +600,25 @@ const followupDetailSelect = {
       authorAdmin: { select: { displayName: true } },
     },
   },
+} satisfies Prisma.TrialCaseSelect;
+
+const followupDraftLlmSelect = {
+  id: true,
+  status: true,
+  concerns: true,
+  student: {
+    select: {
+      yearLevel: true,
+      currentSchool: true,
+    },
+  },
+  requestedCourse: {
+    select: { name: true },
+  },
+  preferredCampus: {
+    select: { name: true, nameZh: true },
+  },
+  participants: followupDetailSelect.participants,
 } satisfies Prisma.TrialCaseSelect;
 
 function isFollowupStatus(status: TrialCaseStatus): status is FollowupStatus {

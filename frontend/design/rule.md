@@ -31,6 +31,7 @@
 | `/trial-cases/:trialCaseId/schedulable-sessions` | `src/api/trial-cases.ts` | 该试听可安排的未来课次，以及关联学生 id / displayName。教师 403。 |
 | `/trial-cases/:trialCaseId/schedule` | `src/api/trial-cases.ts` | 为待安排或改期试听选择已有课次。教师 403。 |
 | `/trial-cases/:trialCaseId` | `src/api/trial-cases.ts` | 管理员试听跟踪详情：草稿、教师反馈、跟进历史。教师 403。 |
+| `/trial-cases/:trialCaseId/followup-draft/generate` | `src/api/trial-cases.ts` | 服务端生成 AI 沟通草稿，不落库、不推进 TrialCase.status。仅 pending_followup / following_up。教师 403。 |
 | `/trial-cases/:trialCaseId/followup-draft` | `src/api/trial-cases.ts` | 保存沟通草稿，不推进 TrialCase.status。仅 pending_followup / following_up。教师 403。 |
 | `/trial-cases/:trialCaseId/follow-ups` | `src/api/trial-cases.ts` | 提交跟进结果并追加 FollowUp。教师 403。 |
 | `/students/:studentId` | `src/api/students.ts` | 学生卡片与试听课程。管理员只能读自己负责的学生。 |
