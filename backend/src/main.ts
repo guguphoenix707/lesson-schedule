@@ -10,6 +10,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app-module';
 import { env } from './env';
+import { SpaNotFoundFilter } from './spa-not-found-filter';
 
 const listNetworkInterfaces = os.networkInterfaces.bind(os);
 os.networkInterfaces = () => {
@@ -54,24 +55,7 @@ async function bootstrap() {
       root: frontendDistPath,
       wildcard: false,
     });
-
-    const fastify = app.getHttpAdapter().getInstance();
-    fastify.setNotFoundHandler((request, reply) => {
-      const acceptsHtml =
-        request.headers.accept?.includes('text/html') ?? false;
-      const isApiRequest =
-        request.url === '/api' || request.url.startsWith('/api/');
-
-      if (!isApiRequest && acceptsHtml) {
-        return reply.type('text/html; charset=utf-8').send(frontendIndex);
-      }
-
-      return reply.code(404).send({
-        message: 'Not Found',
-        error: 'Not Found',
-        statusCode: 404,
-      });
-    });
+    app.useGlobalFilters(new SpaNotFoundFilter(frontendIndex));
   }
 
   await app.listen(env.port, env.host);
