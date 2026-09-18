@@ -19,7 +19,6 @@ try {
     SELECT
       (SELECT COUNT(*) FROM users)
       + (SELECT COUNT(*) FROM students)
-      + (SELECT COUNT(*) FROM campuses)
       + (SELECT COUNT(*) FROM guardians)
       + (SELECT COUNT(*) FROM student_guardians)
       + (SELECT COUNT(*) FROM courses)
@@ -33,6 +32,8 @@ try {
       + (SELECT COUNT(*) FROM verification) AS total_count
   `);
 
+  // The trial-intake migration installs the canonical campus catalogue, so
+  // campuses alone do not mean that the demo journey has already been seeded.
   if (rows[0]?.total_count !== '0') {
     console.log('Database is not empty; skipped demo seed.');
   } else {
