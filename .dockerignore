@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.cursor
+.agents
+node_modules
+frontend/dist
+backend/dist
+backend/.env
+*.log
+coverage
+eval
+docs

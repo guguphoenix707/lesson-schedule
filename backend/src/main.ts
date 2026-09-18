@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { NestFactory } from '@nestjs/core';
@@ -9,7 +9,9 @@ import {
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app-module';
+import { authTrustedOrigins } from './auth/trusted-origins';
 import { env } from './env';
+import { resolveFrontendDistPath } from './frontend-dist-path';
 import { SpaNotFoundFilter } from './spa-not-found-filter';
 
 const listNetworkInterfaces = os.networkInterfaces.bind(os);
@@ -28,7 +30,11 @@ async function bootstrap() {
   );
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: env.frontendOrigin,
+    origin: authTrustedOrigins(
+      env.frontendOrigin,
+      env.betterAuthUrl,
+      env.railwayPublicOrigin,
+    ),
     credentials: true,
   });
 
@@ -41,21 +47,23 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  if (env.isProduction) {
-    const frontendDistPath = path.resolve(process.cwd(), '../frontend/dist');
-    const frontendIndexPath = path.join(frontendDistPath, 'index.html');
+  const frontendDistPath = resolveFrontendDistPath();
+  let frontendIndex: string | undefined;
 
-    if (!existsSync(frontendIndexPath)) {
-      throw new Error(`Frontend build not found at ${frontendIndexPath}`);
-    }
-
-    const frontendIndex = readFileSync(frontendIndexPath, 'utf8');
-
+  if (frontendDistPath) {
+    frontendIndex = readFileSync(
+      path.join(frontendDistPath, 'index.html'),
+      'utf8',
+    );
     app.useStaticAssets({
       root: frontendDistPath,
       wildcard: false,
     });
     app.useGlobalFilters(new SpaNotFoundFilter(frontendIndex));
+  } else if (env.isProduction) {
+    throw new Error(
+      'Frontend build not found. Production must include frontend/dist so GET / can serve the app.',
+    );
   }
 
   await app.listen(env.port, env.host);

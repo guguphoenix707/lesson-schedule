@@ -12,6 +12,8 @@
     "build:frontend": "pnpm --filter @class/frontend build",
     "build:backend": "pnpm --filter @class/backend build",
     "check:filenames": "node scripts/check-filenames.mjs",
-    "check": "pnpm check:filenames && pnpm lint:frontend && pnpm build:frontend && pnpm --filter @class/backend prisma:generate && pnpm build:backend"
+    "check": "pnpm check:filenames && pnpm lint:frontend && pnpm build:frontend && pnpm --filter @class/backend prisma:generate && pnpm build:backend",
+    "build": "pnpm --filter @class/backend prisma:generate && pnpm --filter @class/frontend build && pnpm --filter @class/backend build",
+    "start": "pnpm --filter @class/backend prisma:deploy && pnpm --filter @class/backend seed:demo-if-empty && pnpm --filter @class/backend start:prod"
   }
 }

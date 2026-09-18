@@ -50,3 +50,9 @@ pnpm check
 ```
 
 `prisma generate` 需要 `DATABASE_URL`。CI 使用占位连接串，不连接真实数据库；本地会读取 `backend/.env`。
+
+## Railway 部署
+
+Railway 的 Root Directory 必须是仓库根目录，不要设成 `backend/`。构建用根目录 `Dockerfile`（`railway.json` 固定为 Dockerfile builder），启动时应用迁移和空库演示种子，再由 Nest 在同一域名提供页面和 `/api`。健康检查为 `/api/docs-json`。
+
+公开地址要能打开前端，服务必须构建并带上 `frontend/dist`（根目录 `Dockerfile`，或 Nixpacks 跑根目录 `pnpm build` / `pnpm start`）。把 `BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN` 设成该 Railway HTTPS 域名；未设置时回退 `RAILWAY_PUBLIC_DOMAIN`。若这两项仍只指向 GitHub Pages，页面可以打开，但登录 Origin 校验会失败。

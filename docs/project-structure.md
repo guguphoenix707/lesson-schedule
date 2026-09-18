@@ -6,6 +6,8 @@
 class/
 ├── AGENTS.md
 ├── DESIGN.md
+├── Dockerfile          # Railway 单容器生产构建
+├── railway.json        # Railway 构建、健康检查与重启策略
 ├── README.md
 ├── .agents/
 │   └── skills/antd/SKILL.md
