@@ -5,6 +5,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
+    "startCommand": "cd /app/backend && ./node_modules/.bin/prisma migrate deploy && node scripts/seed-demo-if-empty.mjs && exec node dist/src/main.js",
     "healthcheckPath": "/api/docs-json",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",

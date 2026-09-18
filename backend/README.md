@@ -55,7 +55,7 @@ pnpm --filter @class/backend build
 - `POST /api/auth/sign-out`：退出
 - `GET /api/auth/get-session`：当前会话；未登录返回 `null`
 
-生产部署时设置 `NODE_ENV=production`、`DATABASE_URL`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN`。Railway 同源部署时后两项使用公开 HTTPS 域名；未设置时回退 `RAILWAY_PUBLIC_DOMAIN`。服务会监听平台注入的 `PORT` 和 `0.0.0.0`。只要存在 `frontend/dist` 就会静态托管，并把非 `/api` 的页面路由回退到 SPA 入口。本地开发仍保持 Vite 与 Nest 分开运行及同源代理行为。
+生产部署时设置 `NODE_ENV=production`、`DATABASE_URL`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN`。Railway 同源部署时后两项使用公开 HTTPS 域名；未设置时回退 `RAILWAY_PUBLIC_DOMAIN`。服务会监听平台注入的 `PORT` 和 `0.0.0.0`。生产容器从 `backend/` 启动 `node dist/src/main.js`。只要存在 `frontend/dist` 就会静态托管，并把非 `/api` 的页面路由回退到 SPA 入口。本地开发仍保持 Vite 与 Nest 分开运行及同源代理行为。
 
 业务接口默认先校验会话，再按角色鉴权（本期仅 `admin` / `teacher`）。公开接口只放在 `/api/common`。不提供 `GET /api/me`。
 
