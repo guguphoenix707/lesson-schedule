@@ -16,7 +16,7 @@ Schema 与迁移权威位置在 `db/`，不把业务代码放进 `db/`。试听�
 
 ## 边界
 
-- 不包含用户界面实现或前端构建产物。
+- 不包含用户界面源码；生产部署可静态托管 `frontend/dist`，前端源码和构建配置仍以 `frontend/` 为权威位置。
 - 数据访问通过清晰边界组织，不把存储细节泄漏到接口层。
 - 外部服务调用集中处理超时、错误、重试和可观测性。大模型调用放在 `src/llm/`，业务层只传入已脱敏的上下文。
 - 权限校验默认在可信服务端执行。
@@ -55,7 +55,7 @@ pnpm --filter @class/backend build
 - `POST /api/auth/sign-out`：退出
 - `GET /api/auth/get-session`：当前会话；未登录返回 `null`
 
-生产部署时设置 `NODE_ENV=production`、`DATABASE_URL`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN`。服务会监听平台注入的 `PORT` 和 `0.0.0.0`，允许 `FRONTEND_ORIGIN` 携带 Cookie 跨域访问；本地开发仍保持回环地址和同源代理行为。
+生产部署时设置 `NODE_ENV=production`、`DATABASE_URL`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN`。服务会监听平台注入的 `PORT` 和 `0.0.0.0`，静态托管 `frontend/dist`，并把非 `/api` 的 HTML 路由回退到 SPA 入口；本地开发仍保持 Vite 与 Nest 分开运行及同源代理行为。
 
 业务接口默认先校验会话，再按角色鉴权（本期仅 `admin` / `teacher`）。公开接口只放在 `/api/common`。不提供 `GET /api/me`。
 

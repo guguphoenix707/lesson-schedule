@@ -1,5 +1,7 @@
 import 'reflect-metadata';
+import { existsSync, readFileSync } from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -37,6 +39,44 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
+  if (env.isProduction) {
+    const frontendDistPath = path.resolve(process.cwd(), '../frontend/dist');
+    const frontendIndexPath = path.join(frontendDistPath, 'index.html');
+
+    if (!existsSync(frontendIndexPath)) {
+      throw new Error(`Frontend build not found at ${frontendIndexPath}`);
+    }
+
+    const frontendIndex = readFileSync(frontendIndexPath, 'utf8');
+
+    app.useStaticAssets({
+      root: frontendDistPath,
+      wildcard: false,
+    });
+
+    const fastify = app.getHttpAdapter().getInstance();
+    fastify.route({
+      method: ['GET', 'HEAD'],
+      url: '/*',
+      handler(request, reply) {
+        const acceptsHtml =
+          request.headers.accept?.includes('text/html') ?? false;
+        const isApiRequest =
+          request.url === '/api' || request.url.startsWith('/api/');
+
+        if (!isApiRequest && acceptsHtml) {
+          return reply.type('text/html; charset=utf-8').send(frontendIndex);
+        }
+
+        return reply.code(404).send({
+          message: 'Not Found',
+          error: 'Not Found',
+          statusCode: 404,
+        });
+      },
+    });
+  }
 
   await app.listen(env.port, env.host);
 }
