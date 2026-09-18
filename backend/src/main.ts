@@ -12,6 +12,7 @@ import { AppModule } from './app-module';
 import { authTrustedOrigins } from './auth/trusted-origins';
 import { env } from './env';
 import { resolveFrontendDistPath } from './frontend-dist-path';
+import { prepareDatabase } from './prepare-database';
 import { SpaNotFoundFilter } from './spa-not-found-filter';
 
 const listNetworkInterfaces = os.networkInterfaces.bind(os);
@@ -45,7 +46,7 @@ async function bootstrap() {
     .addCookieAuth('better-auth.session_token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('docs', app, document, { useGlobalPrefix: true });
 
   const frontendDistPath = resolveFrontendDistPath();
   let frontendIndex: string | undefined;
@@ -71,7 +72,20 @@ async function bootstrap() {
     );
   }
 
-  await app.listen(env.port, env.host);
+  await app.init();
+  const fastify = app.getHttpAdapter().getInstance();
+  const address = await fastify.listen({
+    port: env.port,
+    host: env.host,
+  });
+  console.log(`HTTP listening on ${address}`);
+
+  if (env.isProduction) {
+    await prepareDatabase();
+  }
 }
 
-void bootstrap();
+void bootstrap().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

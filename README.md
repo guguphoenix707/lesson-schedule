@@ -53,6 +53,6 @@ pnpm check
 
 ## Railway 部署
 
-Railway 的 Root Directory 必须是仓库根目录，不要设成 `backend/`。构建用根目录 `Dockerfile`（`railway.json` 固定为 Dockerfile builder）。发布前先按与 `db/docker-compose.yml` 相同的节奏等待 Postgres（3 秒间隔、最多 20 次），再跑迁移和空库种子；进程起来后只执行 `node dist/src/main.js`。健康检查为公开接口 `GET /api/common/health`。
+Railway 的 Root Directory 必须是仓库根目录，不要设成 `backend/`。构建用根目录 `Dockerfile`。容器入口只启动 Nest，先监听 `0.0.0.0:$PORT`，再等 Postgres、迁移和空库种子，避免健康检查在数据库未就绪时得到 service unavailable。仪表盘健康检查路径用 `GET /api/docs-json`；`GET /api/common/health` 同样公开可用。
 
 公开地址要能打开前端，服务必须构建并带上 `frontend/dist`（根目录 `Dockerfile`，或 Nixpacks 跑根目录 `pnpm build` / `pnpm start`）。把 `BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN` 设成该 Railway HTTPS 域名；未设置时回退 `RAILWAY_PUBLIC_DOMAIN`。若这两项仍只指向 GitHub Pages，页面可以打开，但登录 Origin 校验会失败。

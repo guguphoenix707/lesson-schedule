@@ -5,10 +5,8 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "preDeployCommand": "cd /app/backend && node scripts/wait-for-postgres.mjs && ./node_modules/.bin/prisma migrate deploy && node scripts/seed-demo-if-empty.mjs",
-    "preDeployTimeoutSeconds": 300,
-    "startCommand": "cd /app/backend && exec node dist/src/main.js",
-    "healthcheckPath": "/api/common/health",
+    "startCommand": "node /app/backend/dist/src/main.js",
+    "healthcheckPath": "/api/docs-json",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
