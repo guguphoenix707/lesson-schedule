@@ -45,4 +45,4 @@ EXPOSE 3000
 
 WORKDIR /app/backend
 
-CMD ["/bin/sh", "-c", "./node_modules/.bin/prisma migrate deploy && node scripts/seed-demo-if-empty.mjs && exec node dist/src/main.js"]
+CMD ["/bin/sh", "-c", "node scripts/wait-for-postgres.mjs && ./node_modules/.bin/prisma migrate deploy && node scripts/seed-demo-if-empty.mjs && exec node dist/src/main.js"]
