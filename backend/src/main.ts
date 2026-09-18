@@ -56,25 +56,21 @@ async function bootstrap() {
     });
 
     const fastify = app.getHttpAdapter().getInstance();
-    fastify.route({
-      method: ['GET', 'HEAD'],
-      url: '/*',
-      handler(request, reply) {
-        const acceptsHtml =
-          request.headers.accept?.includes('text/html') ?? false;
-        const isApiRequest =
-          request.url === '/api' || request.url.startsWith('/api/');
+    fastify.setNotFoundHandler((request, reply) => {
+      const acceptsHtml =
+        request.headers.accept?.includes('text/html') ?? false;
+      const isApiRequest =
+        request.url === '/api' || request.url.startsWith('/api/');
 
-        if (!isApiRequest && acceptsHtml) {
-          return reply.type('text/html; charset=utf-8').send(frontendIndex);
-        }
+      if (!isApiRequest && acceptsHtml) {
+        return reply.type('text/html; charset=utf-8').send(frontendIndex);
+      }
 
-        return reply.code(404).send({
-          message: 'Not Found',
-          error: 'Not Found',
-          statusCode: 404,
-        });
-      },
+      return reply.code(404).send({
+        message: 'Not Found',
+        error: 'Not Found',
+        statusCode: 404,
+      });
     });
   }
 
