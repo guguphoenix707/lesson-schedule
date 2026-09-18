@@ -1,6 +1,12 @@
 # Project
-
 学生管理系统。目录按 frontend / backend / db 分责；技术栈已选定并安装依赖。
+
+## 体验
+[线上体验地址](https://lesson-schedule-production.up.railway.app/)
+
+账号/密码：见  [`db/README.md`](db/README.md) 演示账号
+
+线上部署第二天花了额外的时间，规定时间内完成了本地的开发部分。
 
 ## 快速导航
 
