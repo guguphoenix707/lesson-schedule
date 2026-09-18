@@ -55,7 +55,12 @@ async function bootstrap() {
       path.join(frontendDistPath, 'index.html'),
       'utf8',
     );
-    app.useStaticAssets({
+    const httpAdapter = app.getHttpAdapter();
+    if (!httpAdapter.useStaticAssets) {
+      throw new Error('HTTP adapter cannot serve static assets');
+    }
+    // Nest's useStaticAssets() does not await Fastify's async plugin register.
+    await httpAdapter.useStaticAssets({
       root: frontendDistPath,
       wildcard: false,
     });
