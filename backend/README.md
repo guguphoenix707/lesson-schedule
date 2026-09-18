@@ -55,6 +55,8 @@ pnpm --filter @class/backend build
 - `POST /api/auth/sign-out`：退出
 - `GET /api/auth/get-session`：当前会话；未登录返回 `null`
 
+生产部署时设置 `NODE_ENV=production`、`DATABASE_URL`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` 和 `FRONTEND_ORIGIN`。服务会监听平台注入的 `PORT` 和 `0.0.0.0`，允许 `FRONTEND_ORIGIN` 携带 Cookie 跨域访问；本地开发仍保持回环地址和同源代理行为。
+
 业务接口默认先校验会话，再按角色鉴权（本期仅 `admin` / `teacher`）。公开接口只放在 `/api/common`。不提供 `GET /api/me`。
 
 当前试听待办接口：

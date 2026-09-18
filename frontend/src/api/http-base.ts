@@ -10,8 +10,13 @@ const nestDefaultMessages = new Set([
   'Internal Server Error',
 ]);
 
+const configuredApiOrigin = import.meta.env.VITE_API_BASE_URL?.trim().replace(
+  /\/+$/,
+  '',
+);
+
 export const httpBase = axios.create({
-  baseURL: '/api',
+  baseURL: configuredApiOrigin ? `${configuredApiOrigin}/api` : '/api',
   timeout: 15_000,
   withCredentials: true,
   headers: {

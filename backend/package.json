@@ -6,11 +6,13 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/src/main.js",
     "build": "nest build",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed:auth": "node scripts/seed-auth-accounts.mjs"
+    "seed:auth": "node scripts/seed-auth-accounts.mjs",
+    "seed:demo-if-empty": "node scripts/seed-demo-if-empty.mjs"
   },
   "prisma": {
     "schema": "../db/schema.prisma"

@@ -24,6 +24,10 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
   app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: env.frontendOrigin,
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Class API')
@@ -34,7 +38,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(env.port, '127.0.0.1');
+  await app.listen(env.port, env.host);
 }
 
 void bootstrap();

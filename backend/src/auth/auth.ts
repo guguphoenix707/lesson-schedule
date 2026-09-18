@@ -35,7 +35,9 @@ export const auth = betterAuth({
     },
     defaultCookieAttributes: {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: env.isProduction ? 'none' : 'lax',
+      secure: env.isProduction,
+      partitioned: env.isProduction,
       path: '/',
     },
   },

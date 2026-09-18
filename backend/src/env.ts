@@ -21,6 +21,13 @@ export const env = {
   get frontendOrigin() {
     return process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';
   },
+  get isProduction() {
+    return process.env.NODE_ENV === 'production';
+  },
+  get host() {
+    return process.env.HOST ??
+      (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
+  },
   get port() {
     return Number(process.env.PORT ?? 3000);
   },
